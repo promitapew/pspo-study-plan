@@ -15,16 +15,6 @@ A 4-week, day-by-day study planner for the Professional Scrum Product Owner I (P
   - With a Claude API key (from console.anthropic.com) it becomes a full AI tutor; the key is stored only in your browser
 - Progress is saved in your browser (no account, no server)
 
-> Never put an API key in the files you upload to GitHub. Enter it only in the app's AI settings.
-
-## Publish it on GitHub Pages
-
-1. Sign in to GitHub and create a new public repository, for example `pspo-study-plan`.
-2. Click **Add file → Upload files**, upload `index.html` and this `README.md`, then click **Commit changes**.
-3. Go to **Settings → Pages**.
-4. Under **Build and deployment**, set **Source** to *Deploy from a branch*, choose **main** and **/ (root)**, then click **Save**.
-5. After a minute or two, the app is live at `https://<your-username>.github.io/pspo-study-plan/`.
-
 ## Notes
 
 - Progress is stored in the browser you use. Opening the app on another device starts fresh.
