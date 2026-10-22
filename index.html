@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PSPO I Study Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a sprint board. Tabs for Plan, Cheat sheet and Practice. Plan = summary strip, today card, four one-week Sprints of day cards. */
+:root{
+  --bg:#EDF1F5; --surface:#FFFFFF; --ink:#13203A; --muted:#58647D; --line:#D3DAE5;
+  --accent:#0E6B75; --accent-soft:#DCEFF0; --today:#D9962B; --today-soft:#FBEED6;
+  --good:#1E8449; --good-soft:#DFF3E7; --bad:#BF3D36; --bad-soft:#F8E1DF;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1624; --surface:#172133; --ink:#E6ECF5; --muted:#9AA6BC; --line:#2A364C;
+  --accent:#4FC2C9; --accent-soft:#16363C; --today:#F0B455; --today-soft:#3A2D16;
+  --good:#5FCB8A; --good-soft:#173826; --bad:#F0827A; --bad-soft:#3E1D1B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1624; --surface:#172133; --ink:#E6ECF5; --muted:#9AA6BC; --line:#2A364C;
+  --accent:#4FC2C9; --accent-soft:#16363C; --today:#F0B455; --today-soft:#3A2D16;
+  --good:#5FCB8A; --good-soft:#173826; --bad:#F0827A; --bad-soft:#3E1D1B; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:22px;font-weight:700}
+h3{font-size:17px;font-weight:600}
+a{color:var(--accent)}
+p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.field{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;border-bottom:1px solid var(--line);padding-top:8px;overflow-x:auto}
+.tab{border:0;background:none;padding:10px 14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.view{display:grid;gap:28px}
+
+/* header */
+header{display:grid;gap:16px}
+.intro{max-width:62ch}
+.setup{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end}
+.setup label{display:grid;gap:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:2px}
+.stat b{font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+
+.todaycard{background:var(--today-soft);border:1px solid var(--today);border-radius:12px;padding:18px 20px;display:grid;gap:10px}
+.todaycard .label{color:var(--ink)}
+
+.sprint{display:grid;gap:12px}
+.sprint-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+.goal{color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.day.is-today{border-color:var(--today);box-shadow:0 0 0 2px var(--today-soft)}
+.day.is-done{border-color:var(--good)}
+.day-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.chip{font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.day.is-today .chip{background:var(--today-soft);color:var(--ink)}
+.day.is-done .chip{background:var(--good-soft);color:var(--good)}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tasks label{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start;font-size:15px}
+.tasks input{margin:3px 0 0;accent-color:var(--accent);width:16px;height:16px}
+.tasks input:checked + span{color:var(--muted);text-decoration:line-through}
+.links{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px}
+
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;align-content:start;min-width:0}
+.scoreform{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.scoreform label{display:grid;gap:4px;font-size:14px}
+.scoreform input[type=number]{width:90px}
+.ready{border-radius:8px;padding:10px 12px;font-weight:600}
+.ready.yes{background:var(--good-soft);color:var(--good)}
+.ready.no{background:var(--accent-soft);color:var(--ink)}
+.ready.fail{background:var(--bad-soft);color:var(--bad)}
+.scorelist{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:14px;max-height:200px;overflow:auto}
+.scorelist li{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:4px 0}
+.x{border:0;background:none;color:var(--muted);padding:0 4px}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+
+.q{display:grid;gap:10px}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 12px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.picked{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.explain{border-left:3px solid var(--accent);padding:4px 0 4px 12px}
+.facts{margin:0;padding-left:18px;display:grid;gap:4px}
+
+/* mock */
+.mockbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 46px);z-index:4;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.timer{font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.navgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px}
+.nav{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:4px 0;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.nav.ans{background:var(--accent-soft);border-color:var(--accent)}
+.nav.flag{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.nav.cur{outline:2px solid var(--ink);outline-offset:1px}
+.topics{display:grid;gap:6px}
+.topic{display:grid;grid-template-columns:minmax(110px,160px) 1fr auto;gap:10px;align-items:center;font-size:14px}
+.review{display:grid;gap:12px}
+.review article{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:4px}
+
+/* cheat sheet */
+.sheet{display:grid;gap:20px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.mono{white-space:nowrap}
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.mini{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px;background:var(--bg)}
+.list{margin:0;padding-left:18px;display:grid;gap:4px}
+footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="label">Professional Scrum Product Owner I · 4-week plan</div>
+    <h1>PSPO I Study Plan</h1>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="plan" id="tab-plan" type="button">Plan</button>
+    <button class="tab" role="tab" data-tab="cheatsheet" id="tab-cheatsheet" type="button">Cheat sheet</button>
+    <button class="tab" role="tab" data-tab="practice" id="tab-practice" type="button">Practice &amp; mock exam</button>
+  </nav>
+
+  <!-- PLAN -->
+  <div class="view" id="view-plan">
+    <p class="intro">Four one-week sprints, about 45–60 minutes a day. Tick tasks as you go, log every practice score, and book the exam once you score 95% or more three times in a row.</p>
+    <div class="setup">
+      <label><span class="label">Start date</span><input class="field" type="date" id="start"></label>
+      <div><span class="label">Target exam day</span><div class="mono" id="examday" style="padding-top:8px">—</div></div>
+      <button class="btn ghost" id="reset" type="button">Reset progress</button>
+      <span class="muted row" id="resetConfirm" hidden>Clear all ticks and scores? <button class="btn" id="resetYes" type="button">Yes, clear</button><button class="btn ghost" id="resetNo" type="button">Cancel</button></span>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="label">Days complete</span><b id="sDays">0 / 28</b></div>
+      <div class="stat"><span class="label">Tasks done</span><b id="sTasks">0</b><div class="bar"><i id="sBar"></i></div></div>
+      <div class="stat"><span class="label">Best practice score</span><b id="sBest">—</b></div>
+      <div class="stat"><span class="label">Exam readiness</span><b id="sReady">Not yet</b></div>
+    </div>
+    <section class="todaycard" id="today" aria-live="polite"></section>
+    <div id="sprints" style="display:grid;gap:28px"></div>
+  </div>
+
+  <!-- CHEAT SHEET -->
+  <div class="view sheet" id="view-cheatsheet" hidden>
+    <p class="intro">Everything on one page, based on the 2020 Scrum Guide and the Evidence-Based Management guide. Read it in spare moments. When the exam and your workplace disagree, the guide wins.</p>
+
+    <section class="panel">
+      <h2>Scrum in one breath</h2>
+      <div class="cards3">
+        <div class="mini"><span class="label">Founded on</span><p>Empiricism and lean thinking</p></div>
+        <div class="mini"><span class="label">3 pillars</span><p>Transparency, inspection, adaptation</p></div>
+        <div class="mini"><span class="label">5 values</span><p>Commitment, focus, openness, respect, courage</p></div>
+        <div class="mini"><span class="label">Team</span><p>10 or fewer people. Cross-functional, self-managing, no sub-teams or titles.</p></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Three accountabilities</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Who</th><th>Accountable for</th><th>Remember</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Product Owner</strong></td><td>Maximizing the value of the product. Product Backlog management: the Product Goal, creating and communicating items, ordering, keeping the backlog transparent.</td><td>One person, not a committee. Can delegate work but stays accountable. Stakeholders who want changes must convince the PO.</td></tr>
+          <tr><td><strong>Developers</strong></td><td>The Sprint Backlog (the plan), quality through the Definition of Done, adapting the plan daily, holding each other accountable.</td><td>Size Product Backlog items. Own the Sprint Backlog. Select items for the Sprint in discussion with the PO.</td></tr>
+          <tr><td><strong>Scrum Master</strong></td><td>The Scrum Team's effectiveness and establishing Scrum as defined in the guide.</td><td>Serves the team, the PO and the organization. Causes impediments to be removed. A true leader who serves.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="panel">
+      <h2>Five events</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Event</th><th>Timebox (1-month Sprint)</th><th>Who</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Sprint</strong></td><td class="mono">≤ 1 month</td><td>Scrum Team</td><td>Container for all other events. Next Sprint starts right after. Only the PO can cancel, if the Sprint Goal becomes obsolete.</td></tr>
+          <tr><td><strong>Sprint Planning</strong></td><td class="mono">≤ 8 h</td><td>Scrum Team (+ invited advisers)</td><td>Why is this Sprint valuable? What can be Done? How will it get done? Produces the Sprint Goal.</td></tr>
+          <tr><td><strong>Daily Scrum</strong></td><td class="mono">15 min</td><td>Developers</td><td>Inspect progress toward the Sprint Goal and adapt the Sprint Backlog. Same time and place every day.</td></tr>
+          <tr><td><strong>Sprint Review</strong></td><td class="mono">≤ 4 h</td><td>Scrum Team + key stakeholders</td><td>Inspect the outcome and decide next adaptations. A working session, not a demo or a release gate.</td></tr>
+          <tr><td><strong>Sprint Retrospective</strong></td><td class="mono">≤ 3 h</td><td>Scrum Team</td><td>Plan ways to increase quality and effectiveness. Concludes the Sprint.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted">Shorter Sprints usually have shorter timeboxes.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Artifacts and their commitments</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Artifact</th><th>Commitment</th><th>Owner</th><th>Key rules</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Product Backlog</strong></td><td><strong>Product Goal</strong></td><td>Product Owner</td><td>Emergent, ordered, single source of work. One per product. Fulfill or abandon a Product Goal before the next.</td></tr>
+          <tr><td><strong>Sprint Backlog</strong></td><td><strong>Sprint Goal</strong></td><td>Developers</td><td>Sprint Goal (why) + selected items (what) + plan (how). Updated throughout the Sprint. Scope renegotiated with the PO without endangering the Sprint Goal.</td></tr>
+          <tr><td><strong>Increment</strong></td><td><strong>Definition of Done</strong></td><td>Scrum Team</td><td>Usable, additive, verified. Several per Sprint are allowed. Can be released before Sprint Review. Undone work goes back to the Product Backlog.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <div class="panels">
+      <section class="panel">
+        <h2>EBM: four Key Value Areas</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Area</th><th>Asks</th><th>Example measure</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Current Value</strong></td><td>What value do we deliver today?</td><td>Customer satisfaction</td></tr>
+            <tr><td><strong>Unrealized Value</strong></td><td>How much more value could we deliver?</td><td>Market share gap</td></tr>
+            <tr><td><strong>Time to Market</strong></td><td>How fast can we deliver new value?</td><td>Release frequency, lead time</td></tr>
+            <tr><td><strong>Ability to Innovate</strong></td><td>How effectively can we deliver new capabilities?</td><td>Technical debt, time spent on new work</td></tr>
+          </tbody>
+        </table></div>
+        <p class="muted">EBM goals: Strategic Goal → Intermediate Goals → Immediate Tactical Goals.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Common traps</h2>
+        <ul class="list">
+          <li>User stories, story points, velocity, burn-downs and a "Definition of Ready" are <strong>not</strong> part of Scrum.</li>
+          <li>Velocity measures output, not value. Value is measured by outcomes.</li>
+          <li>The PO doesn't assign tasks, and can't add work to the Sprint Backlog alone.</li>
+          <li>The PO and Scrum Master aren't required at the Daily Scrum.</li>
+          <li>Many teams on one product: one Product Backlog, one PO, one shared Definition of Done.</li>
+          <li>Technical work belongs in the Product Backlog, not a separate backlog.</li>
+          <li>The Sprint Goal doesn't change during the Sprint. The plan to reach it can.</li>
+          <li>Quality doesn't decrease to meet a date.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <!-- PRACTICE -->
+  <div class="view" id="view-practice" hidden>
+    <section class="panel" id="mockPanel"></section>
+    <div class="panels">
+      <section class="panel">
+        <h2>Quick check</h2>
+        <p class="muted">8 random questions with instant feedback. Answer by the Scrum Guide, not by how your workplace does it.</p>
+        <div class="q" id="qBox"></div>
+      </section>
+      <section class="panel" id="scores">
+        <h2>Practice score log</h2>
+        <form class="scoreform" id="scoreForm">
+          <label>Test<select class="field" id="src">
+            <option>Scrum.org Product Owner Open</option>
+            <option>Scrum.org Scrum Open</option>
+            <option>Mikhail Lapshin quiz</option>
+            <option>Udemy practice exam</option>
+            <option>Other</option>
+          </select></label>
+          <label>Score %<input class="field mono" type="number" id="pct" min="0" max="100" required placeholder="92"></label>
+          <button class="btn" type="submit">Log score</button>
+        </form>
+        <p class="muted" style="font-size:14px">In-app mock exam scores are logged automatically.</p>
+        <div class="ready no" id="readyMsg">Log your practice scores to track readiness.</div>
+        <svg id="chart" viewBox="0 0 600 170" role="img" aria-label="Practice scores over time"></svg>
+        <ul class="scorelist" id="scoreList"></ul>
+      </section>
+    </div>
+    <section class="panel">
+      <h2>Exam facts</h2>
+      <ul class="facts">
+        <li><span class="mono">80</span> multiple-choice questions in <span class="mono">60</span> minutes, online, in your own time.</li>
+        <li>Passing score <span class="mono">85%</span> (no more than 12 wrong). Cost <span class="mono">US$200</span> per attempt.</li>
+        <li>Covers the Scrum Guide plus product ownership: value, stakeholders, Evidence-Based Management.</li>
+        <li>The certification never expires and has no renewal fee.</li>
+        <li>Open-book is allowed, but there is under 45 seconds per question.</li>
+      </ul>
+      <div class="links">
+        <a href="https://scrumguides.org/scrum-guide.html" target="_blank" rel="noopener">Scrum Guide</a>
+        <a href="https://www.scrum.org/open-assessments/product-owner-open" target="_blank" rel="noopener">Product Owner Open</a>
+        <a href="https://www.scrum.org/resources/evidence-based-management" target="_blank" rel="noopener">Evidence-Based Management</a>
+        <a href="https://mlapshin.com/index.php/scrum-quizzes/" target="_blank" rel="noopener">Mikhail Lapshin quizzes</a>
+        <a href="https://www.scrum.org/assessments/professional-scrum-product-owner-i-certification" target="_blank" rel="noopener">Buy PSPO I exam</a>
+      </div>
+    </section>
+  </div>
+
+  <footer><span>Progress is saved in this browser only.</span><span>Practice questions are original, based on the 2020 Scrum Guide. They are not real exam questions.</span></footer>
+</div>
+
+<script>
+(function(){
+// ---------- Question bank. Format: [topic, question, [options], explanation]. The FIRST option is always the correct one; options are shuffled when shown.
+const BANK=[
+["Theory","Scrum is founded on which two ideas?",["Empiricism and lean thinking","Predictive planning and lean thinking","Empiricism and command-and-control","Waterfall phases and iteration"],"Scrum is founded on empiricism and lean thinking."],
+["Theory","What are the three pillars of empiricism in Scrum?",["Transparency, inspection, adaptation","Planning, execution, review","Commitment, focus, courage","Openness, respect, transparency"],"Transparency, inspection and adaptation are the three empirical pillars."],
+["Theory","Which of these is NOT one of the five Scrum values?",["Transparency","Commitment","Courage","Respect"],"The values are commitment, focus, openness, respect and courage. Transparency is a pillar, not a value."],
+["Theory","According to empiricism, knowledge comes from:",["Experience and making decisions based on what is observed","Detailed upfront analysis","Expert opinion","Following industry best practices"],"Empiricism asserts that knowledge comes from experience and making decisions based on what is observed."],
+["Theory","Inspection shows the product is outside acceptable limits. When should the team adjust?",["As soon as possible","At the next Sprint Retrospective","At the end of the release","After management approves"],"Adjustment must be made as soon as possible to minimize further deviation."],
+["Theory","How does the Scrum Guide describe Scrum?",["A lightweight framework","A complete methodology","A detailed project management process","A collection of software best practices"],"Scrum is a lightweight framework that helps people, teams and organizations generate value through adaptive solutions for complex problems."],
+["Theory","True or false: Scrum is intentionally incomplete.",["True","False"],"The guide says Scrum is purposefully incomplete, defining only the parts required to implement Scrum theory."],
+["Theory","Inspection without transparency is:",["Misleading and wasteful","Acceptable in short Sprints","The Scrum Master's call","Required before adaptation"],"Inspection without transparency is misleading and wasteful, because decisions rest on artifacts people can't see clearly."],
+["Theory","How are the Scrum events organized for inspection and adaptation?",["Four formal events inside the Sprint, which contains them","Only the Sprint Review inspects","Two events: Review and Retrospective","Events are scheduled by the Scrum Master as needed"],"Scrum combines four formal events for inspection and adaptation within a containing event, the Sprint."],
+["Theory","Scrum is designed for which kind of work?",["Complex work, where more is unknown than known","Simple, repeatable work","Projects with fixed, fully known requirements","Only software development"],"Scrum uses an iterative, incremental approach to control risk in complex work."],
+["Team","How large is a Scrum Team?",["Typically 10 or fewer people","Exactly 7 people","3 to 9 Developers, plus PO and Scrum Master","The guide gives no guidance"],"The Scrum Team is small enough to remain nimble, typically 10 or fewer people."],
+["Team","A Scrum Team consists of:",["One Scrum Master, one Product Owner and Developers","A manager, a Product Owner and Developers","One Scrum Master, several Product Owners and Developers","Developers and testers"],"The fundamental unit of Scrum is one Scrum Master, one Product Owner and Developers."],
+["Team","Does a Scrum Team have sub-teams or hierarchies?",["No, it is one cohesive unit focused on one objective","Yes, for development and testing","Yes, led by a team lead","Only in large organizations"],"Within a Scrum Team there are no sub-teams or hierarchies."],
+["Team","Scrum Teams are self-managing. What does that mean?",["They internally decide who does what, when and how","The Scrum Master assigns tasks","The Product Owner decides how the work is done","Management sets the daily plan"],"Self-managing means the team internally decides who does what, when and how."],
+["Team","Which is an accountability of the Developers?",["Creating a plan for the Sprint, the Sprint Backlog","Ordering the Product Backlog","The Scrum Team's effectiveness","Approving releases for stakeholders"],"Developers create the Sprint Backlog, instill quality via the Definition of Done, adapt their plan daily and hold each other accountable."],
+["Team","The Scrum Master is accountable for:",["The Scrum Team's effectiveness","Maximizing product value","Assigning work to Developers","The release schedule"],"The Scrum Master is accountable for establishing Scrum and for the Scrum Team's effectiveness."],
+["Team","How does the Scrum Master serve the Product Owner?",["By helping find techniques for effective Product Goal definition and Product Backlog management","By writing Product Backlog items for them","By ordering the backlog when the PO is busy","By approving the Sprint Goal"],"The Scrum Master helps the PO with techniques, clear backlog items, empirical product planning and stakeholder collaboration."],
+["Team","Who is accountable for creating a valuable, useful Increment every Sprint?",["The entire Scrum Team","Only the Developers","Only the Product Owner","The Scrum Master"],"The entire Scrum Team is accountable for creating a valuable, useful Increment every Sprint."],
+["Team","Does Scrum define a separate tester or QA role?",["No; Developers are accountable for quality by adhering to the Definition of Done","Yes, testers are a fourth accountability","Yes, the Scrum Master does testing","Only for teams larger than 10"],"Scrum has three accountabilities only. Quality is built in by the Developers through the Definition of Done."],
+["Team","Who are the Developers?",["The people committed to creating any aspect of a usable Increment each Sprint","Only programmers","People who report to the Scrum Master","Only people who write code and tests"],"Developers are anyone in the Scrum Team creating any aspect of a usable Increment, whatever their specialty."],
+["Team","How does the Scrum Master serve the organization?",["Leading, training and coaching it in its Scrum adoption","Reporting each Developer's performance","Approving team budgets","Setting the Product Goal"],"The Scrum Master leads, trains and coaches the organization and helps remove barriers between stakeholders and Scrum Teams."],
+["Team","Who causes impediments to the Scrum Team's progress to be removed?",["The Scrum Master","The Product Owner","Management only","No one; impediments must be accepted"],"Causing the removal of impediments is one way the Scrum Master serves the Scrum Team."],
+["Product Owner","The Product Owner is accountable for:",["Maximizing the value of the product resulting from the Scrum Team's work","Maximizing the Developers' output","Delivering exactly the original plan","Keeping stakeholders happy at any cost"],"The Product Owner is accountable for maximizing the value of the product."],
+["Product Owner","The Product Owner is:",["One person, not a committee","A committee of business representatives","Whoever is most senior","A role rotated each Sprint"],"The PO is one person. They may represent many stakeholders' needs in the Product Backlog."],
+["Product Owner","A stakeholder wants to change the order of the Product Backlog. What should they do?",["Convince the Product Owner","Ask the Developers to change it","Ask the Scrum Master to change it","Change it directly"],"Those wanting to change the Product Backlog can do so by trying to convince the Product Owner."],
+["Product Owner","Which is NOT part of Product Backlog management?",["Assigning Sprint tasks to individual Developers","Developing and communicating the Product Goal","Ordering Product Backlog items","Ensuring the Product Backlog is transparent and understood"],"Developers decide who does what. The PO manages the Product Backlog, not daily tasks."],
+["Product Owner","For a Product Owner to succeed, the organization must:",["Respect their decisions","Give them a team of analysts","Let them assign Developers' work","Approve each of their decisions first"],"The guide says the entire organization must respect the PO's decisions."],
+["Product Owner","Where are the Product Owner's decisions visible?",["In the content and ordering of the Product Backlog and the inspectable Increment at Sprint Review","Only in status reports","In the Sprint Backlog task list","In the Scrum Master's notes"],"PO decisions are visible in the Product Backlog and through the Increment at the Sprint Review."],
+["Product Owner","The PO has a business analyst write Product Backlog items. Who is accountable for them?",["The Product Owner","The business analyst","The Scrum Master","The Developers"],"The PO may have others do the work, but the Product Owner remains accountable."],
+["Product Owner","What does the Product Owner bring to Sprint Planning?",["A proposal for how the product could increase its value and utility in the current Sprint","A list of tasks for each Developer","Estimates for every item","The Definition of Done"],"The PO proposes how the product could increase value; the whole Scrum Team then defines a Sprint Goal."],
+["Product Owner","Who selects the Product Backlog items for the Sprint?",["The Developers, through discussion with the Product Owner","The Product Owner alone","The Scrum Master","Stakeholders at Sprint Review"],"Through discussion with the PO, the Developers select items from the Product Backlog for the Sprint."],
+["Product Owner","Who crafts the Sprint Goal?",["The whole Scrum Team, during Sprint Planning","The Product Owner alone, before Sprint Planning","The Developers alone","The Scrum Master"],"The whole Scrum Team collaborates to define the Sprint Goal during Sprint Planning."],
+["Product Owner","Is the Product Owner required to attend the Daily Scrum?",["No, it is an event for the Developers","Yes, to answer questions","Yes, to report to stakeholders","Only on the first day of the Sprint"],"The Daily Scrum is for the Developers. The PO takes part only if actively working on Sprint Backlog items."],
+["Product Owner","How should the Product Owner order the Product Backlog?",["Scrum doesn't prescribe a technique; the PO decides how best to order it","Strictly by business value","Strictly by risk","In the order stakeholders submitted items"],"The guide makes ordering the PO's responsibility without prescribing a method. Value, risk and dependencies are all common inputs."],
+["Product Owner","Can the Product Owner also do Developer work?",["Yes; when actively working on Sprint Backlog items, they participate as Developers","No, never","Only with the Scrum Master's permission","Only on teams smaller than 5"],"The guide notes that a PO or Scrum Master actively working on Sprint Backlog items participates as a Developer."],
+["Product Owner","Three Scrum Teams build one product. How many Product Backlogs and Product Owners should there be?",["One of each","Three of each","One backlog, three Product Owners","Three backlogs, one Product Owner"],"A product has one Product Backlog and one Product Owner, however many Scrum Teams work on it."],
+["Product Owner","Who can cancel a Sprint?",["Only the Product Owner","The Scrum Master","Senior management","The Developers by majority vote"],"Only the PO has the authority to cancel a Sprint, and only if the Sprint Goal becomes obsolete."],
+["Product Backlog","The Product Backlog is:",["An emergent, ordered list of what is needed to improve the product","A fixed list of requirements signed off at the start","The Developers' task list for the Sprint","A list owned by stakeholders"],"The Product Backlog is emergent and ordered, and is the single source of work for the Scrum Team."],
+["Product Backlog","The Product Backlog is the single source of:",["Work undertaken by the Scrum Team","Status reports","Defects only","Management-approved requirements"],"All work the Scrum Team undertakes comes from the Product Backlog."],
+["Product Backlog","Which Product Backlog items are usually ready for selection at Sprint Planning?",["Items that can be Done by the Scrum Team within one Sprint","Items with full specifications signed by stakeholders","Items with story points","Any item at the top, whatever its size"],"Items that can be Done within one Sprint are deemed ready for selection."],
+["Product Backlog","Product Backlog refinement is:",["An ongoing activity to add details such as description, order and size","A formal event with a 2-hour timebox","Done only by the Product Owner","Done only at the start of a release"],"Refinement is an ongoing activity, not an event, and the attributes added vary with the domain of work."],
+["Product Backlog","Where is the Product Goal?",["In the Product Backlog","In the Sprint Backlog","In the Definition of Done","In a separate charter document"],"The Product Goal is in the Product Backlog. It is the Product Backlog's commitment."],
+["Product Backlog","Before taking on the next Product Goal, the Scrum Team must:",["Fulfill or abandon the current one","Get management approval","Finish the entire Product Backlog","Complete three Sprints"],"The Scrum Team works on one Product Goal at a time and must fulfill or abandon it before taking on the next."],
+["Product Backlog","Is the Product Backlog ever complete?",["No, it is emergent and changes as more is learned","Yes, once requirements are gathered","Yes, at the first release","Yes, once the budget is set"],"The Product Backlog is emergent. It evolves with the product and its environment."],
+["Product Backlog","Is a \"Definition of Ready\" part of Scrum?",["No, the Scrum Guide doesn't define one","Yes, it is the commitment for the Product Backlog","Yes, it is required before Sprint Planning","Yes, the Scrum Master owns it"],"The Scrum Guide has no Definition of Ready. Teams may use one as a complementary practice."],
+["Product Backlog","A database upgrade is needed. Where should this work be tracked?",["In the Product Backlog","In a separate technical backlog","Outside Scrum entirely","In the Definition of Done"],"The Product Backlog is the single source of all work, including technical work."],
+["Product Backlog","How does the guide describe a product?",["A vehicle to deliver value, with a clear boundary, known stakeholders and well-defined users or customers","Only a piece of software","Any project with a budget","A list of features"],"A product could be a service, a physical product or something more abstract."],
+["Product Backlog","Who is responsible for sizing Product Backlog items?",["The Developers who will do the work","The Product Owner","The Scrum Master","Whoever wrote the item"],"The Developers who will do the work are responsible for sizing. The PO can help them understand trade-offs."],
+["Product Backlog","Which of these is part of the Scrum framework itself?",["The Sprint Goal","User stories","Story points","Velocity"],"User stories, story points and velocity are optional practices. The Sprint Goal is part of Scrum."],
+["Events","What is the maximum length of a Sprint?",["One month","Two weeks","Six weeks","Whatever the PO decides"],"Sprints are fixed-length events of one month or less."],
+["Events","Which is true during a Sprint?",["No changes are made that would endanger the Sprint Goal","The PO can change the Sprint Goal","Quality goals can be lowered to meet the date","The Product Backlog is frozen"],"During the Sprint the Sprint Goal is protected, quality doesn't decrease, and the Product Backlog is refined as needed."],
+["Events","When does a new Sprint start?",["Immediately after the previous Sprint ends","After a short planning gap","When the Product Owner decides","After each release"],"A new Sprint starts immediately after the conclusion of the previous one."],
+["Events","Which three topics does Sprint Planning address?",["Why the Sprint is valuable, what can be Done, and how the work will get done","Who, when and budget","Risks, issues and dependencies","Estimate, assign and approve"],"Sprint Planning covers why, what and how."],
+["Events","What is the purpose of the Daily Scrum?",["Inspect progress toward the Sprint Goal and adapt the Sprint Backlog as needed","Report status to the Scrum Master","Let the PO assign new work","Update stakeholders"],"The Daily Scrum inspects progress toward the Sprint Goal and adapts the plan."],
+["Events","What is the timebox of the Daily Scrum?",["15 minutes","30 minutes","15 minutes per Developer","1 hour"],"The Daily Scrum is a 15-minute event, held at the same time and place every working day."],
+["Events","What is the maximum Sprint Review timebox for a one-month Sprint?",["4 hours","2 hours","8 hours","1 hour"],"The Sprint Review is timeboxed to a maximum of four hours for a one-month Sprint."],
+["Events","What is the purpose of the Sprint Retrospective?",["Plan ways to increase quality and effectiveness","Review the product with stakeholders","Re-order the Product Backlog","Approve the Increment"],"The Retrospective is for the Scrum Team to improve how it works."],
+["Events","What is the maximum Sprint Retrospective timebox for a one-month Sprint?",["3 hours","1.5 hours","4 hours","8 hours"],"The Sprint Retrospective is timeboxed to a maximum of three hours for a one-month Sprint."],
+["Events","What is the maximum Sprint Planning timebox for a one-month Sprint?",["8 hours","4 hours","2 hours","One full week"],"Sprint Planning is timeboxed to a maximum of eight hours for a one-month Sprint."],
+["Events","For Sprints shorter than one month, event timeboxes are:",["Usually shorter","Exactly the same","Longer, to compensate","Removed"],"For shorter Sprints, the events are usually shorter."],
+["Events","Is the Daily Scrum the only time Developers may adjust their plan?",["No, they often meet throughout the day to adapt","Yes","Only when the PO is present","Only at Sprint Review"],"The Daily Scrum is not the only time Developers can adjust their plan."],
+["Events","Why are Sprints limited to one month or less?",["Longer horizons risk the Sprint Goal becoming invalid, complexity rising and risk increasing","To match payroll cycles","Because releases must be monthly","To limit meeting time"],"Shorter Sprints limit risk and create more learning cycles."],
+["Events","Which event concludes the Sprint?",["Sprint Retrospective","Sprint Review","The release","Daily Scrum"],"The Sprint Retrospective concludes the Sprint."],
+["Events","What happens at the Sprint Review?",["The Scrum Team presents results to key stakeholders and progress toward the Product Goal is discussed","The Scrum Master evaluates each Developer","The team plans process improvements","Stakeholders sign off the Sprint Backlog"],"The Sprint Review is a working session to inspect the outcome and decide what to do next."],
+["Events","Who attends Sprint Planning?",["The entire Scrum Team, who may invite others for advice","Only the PO and Scrum Master","Only the Developers","All stakeholders"],"The entire Scrum Team plans the Sprint and may invite others to provide advice."],
+["Events","What is the Sprint?",["A container for all other events, with a fixed length of one month or less","A release phase","An optional event","A planning meeting"],"The Sprint is the heartbeat of Scrum and contains all other events."],
+["Events","Is the Sprint Review a demo meeting or a release gate?",["Neither; it is a working session, and should never be a gate to releasing value","A demo meeting","A release gate","A sign-off meeting"],"The guide says the Scrum Team should avoid limiting the Sprint Review to a presentation, and it is not a release gate."],
+["Artifacts","The Sprint Backlog is made up of:",["The Sprint Goal, the selected Product Backlog items and an actionable plan","Only the selected Product Backlog items","The Product Backlog and the Definition of Done","Tasks assigned by the Scrum Master"],"Sprint Backlog = Sprint Goal (why) + selected items (what) + plan (how)."],
+["Artifacts","When is the Sprint Goal created?",["During Sprint Planning","At the Sprint Review","Before the Sprint, by the PO","During the first Daily Scrum"],"The Sprint Goal is created during Sprint Planning and added to the Sprint Backlog."],
+["Artifacts","Mid-Sprint, the work turns out different than expected. What should happen?",["The Developers collaborate with the PO to negotiate Sprint Backlog scope without affecting the Sprint Goal","The Sprint is cancelled automatically","The Scrum Master extends the Sprint","The Sprint Goal is rewritten"],"Scope is renegotiated within the Sprint while the Sprint Goal stays intact."],
+["Artifacts","During the Sprint, the PO wants to add a new item to the Sprint Backlog. What happens?",["The Developers own the Sprint Backlog; scope can be clarified and renegotiated with the PO without endangering the Sprint Goal","The PO adds it, since they own all backlogs","The Scrum Master decides","It must wait for the next Sprint, no exceptions"],"The Sprint Backlog is a plan by and for the Developers."],
+["Artifacts","An Increment is:",["A concrete stepping stone toward the Product Goal, additive to all prior Increments","Any partly finished work","The Sprint Backlog","The Product Backlog"],"Each Increment is additive, thoroughly verified and works with all prior Increments."],
+["Artifacts","To provide value, an Increment must be:",["Usable","Released to production","Approved by stakeholders","Fully documented"],"An Increment must be usable to provide value. Releasing it is a separate decision."],
+["Artifacts","The Definition of Done is:",["A formal description of the Increment's state when it meets the quality measures required for the product","The PO's acceptance checklist","A document the Scrum Master owns","Optional"],"The Definition of Done is the Increment's commitment and creates transparency about what was completed."],
+["Artifacts","There is no organizational Definition of Done. Who creates one?",["The Scrum Team","The Product Owner alone","The Scrum Master alone","Management"],"If it isn't an organizational standard, the Scrum Team must create a Definition of Done appropriate for the product."],
+["Artifacts","Several Scrum Teams work on the same product. What about the Definition of Done?",["They mutually define and comply with the same Definition of Done","Each team keeps its own","The PO writes one for each team","It isn't needed"],"Teams working on the same product share one Definition of Done."],
+["Artifacts","Who updates the Sprint Backlog during the Sprint?",["The Developers, as more is learned","The Product Owner","The Scrum Master","Stakeholders"],"The Sprint Backlog is updated throughout the Sprint by the Developers."],
+["Artifacts","How many Increments can be created in one Sprint?",["One or more","Exactly one","None until the final Sprint","One per Developer"],"Multiple Increments may be created within a Sprint."],
+["Artifacts","What is the commitment for the Product Backlog?",["The Product Goal","The Sprint Goal","The Definition of Done","The release plan"],"Product Backlog → Product Goal. Sprint Backlog → Sprint Goal. Increment → Definition of Done."],
+["Artifacts","An item doesn't meet the Definition of Done at the end of the Sprint. What happens?",["It can't be part of the Increment and returns to the Product Backlog","It is shown at Sprint Review as partly done","It is released with a known-issue note","The Sprint is extended until it is Done"],"Work that doesn't meet the Definition of Done goes back to the Product Backlog for future consideration."],
+["Artifacts","Can an Increment be released before the Sprint Review?",["Yes, it may be delivered to stakeholders before the end of the Sprint","No, only after the Sprint Review","Only with stakeholder sign-off","Only in the final Sprint"],"The Sprint Review should never be considered a gate to releasing value."],
+["Value & EBM","What are the four Key Value Areas in Evidence-Based Management?",["Current Value, Unrealized Value, Time to Market, Ability to Innovate","Velocity, Quality, Cost, Scope","Revenue, Profit, Growth, Retention","Output, Outcome, Impact, Effort"],"EBM measures value through Current Value, Unrealized Value, Time to Market and Ability to Innovate."],
+["Value & EBM","Customer satisfaction is a measure of which Key Value Area?",["Current Value","Unrealized Value","Time to Market","Ability to Innovate"],"Current Value is the value the product delivers today."],
+["Value & EBM","The gap between the value delivered now and the potential value in the market is:",["Unrealized Value","Current Value","Ability to Innovate","Time to Market"],"Unrealized Value is the potential future value the product could realize."],
+["Value & EBM","Release frequency and lead time measure which Key Value Area?",["Time to Market","Current Value","Unrealized Value","Ability to Innovate"],"Time to Market is how quickly the organization can deliver new capabilities."],
+["Value & EBM","In EBM, technical debt is a measure under which Key Value Area?",["Ability to Innovate","Current Value","Unrealized Value","Time to Market"],"Technical debt reduces an organization's ability to deliver new capabilities."],
+["Value & EBM","What are the levels of goals in EBM?",["Strategic Goal, Intermediate Goals, Immediate Tactical Goals","Vision, Mission, Tasks","Annual, Quarterly, Weekly","Product, Release, Sprint"],"EBM breaks large goals into Strategic, Intermediate and Immediate Tactical Goals."],
+["Value & EBM","Is velocity a measure of value delivered?",["No, it measures output, not outcomes or value","Yes, higher velocity means more value","Yes, if story points are accurate","Only for mature teams"],"Value is shown by outcomes for customers and the business, not by how much work was completed."],
+["Value & EBM","What role do forecasting tools like burn-down charts play in Scrum?",["They can be useful but don't replace the importance of empiricism","They are required artifacts","They are owned by the Scrum Master","They define the Sprint Goal"],"The guide says such practices may be useful but don't replace empiricism."],
+["Value & EBM","What is the best way for a PO to learn whether the product delivers value?",["Release usable Increments and measure outcomes with real users","Count completed story points","Track hours worked","Check that all original requirements were built"],"Empiricism means learning from real use, so frequent releases and outcome measures beat output metrics."],
+["Value & EBM","Which of these is an outcome rather than an output?",["Customers complete checkout 20% faster","The team completed 40 story points","Ten features were shipped","Fifty tickets were closed"],"Outcomes describe a change in customer or business results. The others count work done."]
+];
+
+const L={guide:["Scrum Guide","https://scrumguides.org/scrum-guide.html"],open:["Product Owner Open","https://www.scrum.org/open-assessments/product-owner-open"],sopen:["Scrum Open","https://www.scrum.org/open-assessments/scrum-open"],ebm:["EBM Guide","https://www.scrum.org/resources/evidence-based-management"],lap:["Lapshin quizzes","https://mlapshin.com/index.php/scrum-quizzes/"],buy:["Buy exam","https://www.scrum.org/assessments/professional-scrum-product-owner-i-certification"],sheet:["Cheat sheet","#cheatsheet"],mock:["In-app mock exam","#practice"],quick:["Quick check","#practice"]};
+const SPRINTS=[
+ {name:"Sprint 1",goal:"Know the Scrum Guide well enough to explain every rule in your own words.",days:[
+  {t:"Read the whole Scrum Guide",m:60,tasks:["Read the Scrum Guide start to finish (about 13 pages)","Write down every term you can't explain yet"],links:["guide"]},
+  {t:"Theory and values",m:45,tasks:["Learn the 3 pillars: transparency, inspection, adaptation","Learn the 5 values: commitment, focus, openness, respect, courage","Explain empiricism in two sentences"],links:["guide","sheet"]},
+  {t:"The Scrum Team",m:45,tasks:["Team size (10 or fewer), cross-functional, self-managing","Compare Developers, Product Owner and Scrum Master accountabilities","Note: no sub-teams or hierarchies inside a Scrum Team"],links:["guide","sheet"]},
+  {t:"The Product Owner",m:60,tasks:["PO is one person, not a committee","PO is accountable for maximizing product value","List the 4 parts of Product Backlog management","PO can delegate work but stays accountable"],links:["guide"]},
+  {t:"The five events",m:60,tasks:["Sprint: one month or less, a container for all events","Timeboxes for a 1-month Sprint: Planning 8h, Review 4h, Retro 3h, Daily 15 min","Who attends and who leads each event"],links:["guide","sheet"]},
+  {t:"Artifacts and commitments",m:45,tasks:["Product Backlog → Product Goal","Sprint Backlog → Sprint Goal","Increment → Definition of Done","Write your own one-page summary, then compare it with the Cheat sheet tab"],links:["guide","sheet"]},
+  {t:"Baseline test",m:45,tasks:["Take Product Owner Open once with no notes","Log your score in the Practice tab","Re-read the guide sections behind every wrong answer"],links:["open","guide"]}]},
+ {name:"Sprint 2",goal:"Think like a Product Owner: value, backlog and stakeholders.",days:[
+  {t:"Backlog refinement",m:45,tasks:["Refinement adds detail, order and size to items","Developers who do the work are responsible for sizing","Ordering is the PO's call"],links:["guide"]},
+  {t:"Product Goal and one backlog",m:45,tasks:["One product = one Product Backlog = one Product Owner","Several Scrum Teams on one product share both","A Scrum Team works on one Product Goal at a time"],links:["guide"]},
+  {t:"Stakeholders and Sprint Review",m:45,tasks:["Sprint Review is a working session, not a demo","PO and stakeholders adjust the Product Backlog together","Only the PO can cancel a Sprint, when the Sprint Goal becomes obsolete"],links:["guide"]},
+  {t:"Measuring value (EBM)",m:60,tasks:["Read the Evidence-Based Management guide","Learn the 4 Key Value Areas: Current Value, Unrealized Value, Time to Market, Ability to Innovate","Pick one example metric for each area"],links:["ebm","sheet"]},
+  {t:"Forecasting and releases",m:45,tasks:["Burn-downs and similar forecasts are useful but don't replace empiricism","Releases can happen any time, even before Sprint Review","Write the difference between output and outcome"],links:["guide"]},
+  {t:"Practice round 1",m:60,tasks:["Product Owner Open, twice","Scrum Open, once","Log all scores and review every wrong answer"],links:["open","sopen"]},
+  {t:"Light review",m:30,tasks:["Read the Cheat sheet tab","Do two rounds of the Quick check"],links:["sheet","quick"]}]},
+ {name:"Sprint 3",goal:"Find and fix weak spots with timed practice.",days:[
+  {t:"Definition of Done",m:45,tasks:["If the organization has a DoD, the Scrum Team follows it as a minimum","Work that isn't Done can't be part of an Increment and goes back to the Product Backlog","Several Increments can be made in one Sprint"],links:["guide"]},
+  {t:"Who owns the Sprint Backlog",m:45,tasks:["The Sprint Backlog belongs to the Developers","The PO can't add work mid-Sprint alone; scope is renegotiated with the PO","The Sprint Goal does not change during the Sprint"],links:["guide"]},
+  {t:"Many teams, one product",m:45,tasks:["Shared Product Backlog and Product Owner","Teams on one product share a Definition of Done","Dependencies are the teams' problem to solve, not a reason for extra roles"],links:["guide"]},
+  {t:"Outside practice",m:60,tasks:["Do 2 Mikhail Lapshin PO quizzes","Log scores","Note any question that contradicts the guide; the guide wins"],links:["lap"]},
+  {t:"What Scrum doesn't prescribe",m:45,tasks:["User stories, story points and velocity are optional practices","Scrum doesn't prescribe an estimation technique","MVP, roadmaps and personas are PO tools outside the guide"],links:["sheet"]},
+  {t:"Timed mock exam 1",m:75,tasks:["Take the in-app mock: 80 questions in 60 minutes","Your score logs automatically","Note the weakest topics in the results"],links:["mock"]},
+  {t:"Fix mistakes",m:45,tasks:["Go through every wrong answer in the mock review","Re-read those guide sections"],links:["guide","mock"]}]},
+ {name:"Sprint 4",goal:"Score 95%+ three times in a row, then book and pass.",days:[
+  {t:"Final guide read",m:45,tasks:["Read the full Scrum Guide one last time","Check every term on your Day 1 list is now clear"],links:["guide"]},
+  {t:"Aim for 100%",m:45,tasks:["Product Owner Open until you score 100%","Log the score"],links:["open"]},
+  {t:"Timed mock exam 2",m:75,tasks:["Take the in-app mock again (questions are reshuffled)","Target 90% or more"],links:["mock"]},
+  {t:"Weak areas",m:45,tasks:["Review the topics you missed in the mock","Read the Cheat sheet's common traps","Do the Quick check"],links:["sheet","quick"]},
+  {t:"Readiness check",m:45,tasks:["Product Owner Open again","If your last 3 scores are all 95%+, buy the exam password (US$200)"],links:["open","buy"]},
+  {t:"Rest and set up",m:30,tasks:["Light review of the Cheat sheet only","Plan a quiet hour with stable internet","Keep a notepad to flag questions to revisit"],links:["sheet"]},
+  {t:"Exam day",m:60,tasks:["Take PSPO I: 80 questions, 60 minutes, 85% to pass","Answer by the Scrum Guide, not workplace habit","Add PSPO I to LinkedIn, resume and portfolio"],links:["buy"]}]}
+];
+
+const KEY="pspo-study-plan-v1", MOCK_N=80, MOCK_MS=60*60*1000;
+const today=new Date(); today.setHours(0,0,0,0);
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fmt=d=>d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const range=n=>Array.from({length:n},(_,i)=>i);
+const $=id=>document.getElementById(id);
+
+let S={start:iso(today),done:{},scores:[],mock:null,lastMock:null};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+// ---------- tabs
+const TABS=["plan","cheatsheet","practice"];
+function showTab(t,scroll){if(!TABS.includes(t))t="plan";
+  TABS.forEach(x=>{$("view-"+x).hidden=x!==t;$("tab-"+x).setAttribute("aria-selected",String(x===t))});
+  if(scroll)window.scrollTo({top:0});}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab,true)));
+document.addEventListener("click",e=>{const a=e.target.closest("a[href^='#']");if(!a)return;e.preventDefault();showTab(a.getAttribute("href").slice(1),true)});
+showTab((location.hash||"").slice(1));
+
+// ---------- plan
+const DAYS=[];SPRINTS.forEach((s,si)=>s.days.forEach(d=>DAYS.push({...d,si,n:DAYS.length})));
+const totalTasks=DAYS.reduce((a,d)=>a+d.tasks.length,0);
+const dayDone=d=>d.tasks.every((_,i)=>S.done[`d${d.n}-${i}`]);
+$("start").value=S.start;
+$("start").addEventListener("change",e=>{if(e.target.value){S.start=e.target.value;save();renderPlan()}});
+const linksHtml=keys=>keys.length?`<div class="links">${keys.map(k=>{const [lab,url]=L[k];return url[0]==="#"?`<a href="${url}">${lab}</a>`:`<a href="${url}" target="_blank" rel="noopener">${lab}</a>`}).join("")}</div>`:"";
+const tasksHtml=(d,pre)=>`<ul class="tasks">${d.tasks.map((t,i)=>{const k=`d${d.n}-${i}`;return `<li><label><input type="checkbox" data-k="${k}" id="${pre}${k}" ${S.done[k]?"checked":""}><span>${esc(t)}</span></label></li>`}).join("")}</ul>`;
+const ready=()=>{const last=S.scores.slice(-3);return last.length===3&&last.every(s=>s.pct>=95)};
+
+function renderPlan(){
+  const start=parse(S.start),idx=Math.round((today-start)/864e5);
+  $("examday").textContent=fmt(addDays(start,27));
+  $("sprints").innerHTML=SPRINTS.map((s,si)=>`<section class="sprint">
+    <div class="sprint-head"><h2>${s.name}</h2><span class="label mono">${fmt(addDays(start,si*7))} – ${fmt(addDays(start,si*7+6))}</span></div>
+    <p class="goal"><strong>Sprint Goal:</strong> ${esc(s.goal)}</p>
+    <div class="days">${s.days.map((_,di)=>{const d=DAYS[si*7+di],done=dayDone(d),cls=(d.n===idx?" is-today":"")+(done?" is-done":"");
+      return `<article class="day${cls}"><div class="day-top"><span class="label">Day ${d.n+1} · ${fmt(addDays(start,d.n))}</span><span class="chip">${done?"Done":d.n===idx?"Today":d.m+" min"}</span></div><h3>${esc(d.t)}</h3>${tasksHtml(d,"t")}${linksHtml(d.links)}</article>`}).join("")}</div></section>`).join("");
+  let t;
+  if(idx<0)t=`<div class="label">Coming up</div><h2>Your plan starts in ${-idx} day${idx===-1?"":"s"}</h2><p>First up: ${esc(DAYS[0].t)}.</p>`;
+  else if(idx>27)t=`<div class="label">Plan complete</div><h2>${ready()?"You're ready. Go book the exam.":"The 28 days are over"}</h2><p>${ready()?"Your last three scores are all 95% or higher.":"Keep practising until your last three scores are 95%+, or change the start date to restart."}</p>`;
+  else{const d=DAYS[idx];t=`<div class="label">Today · Day ${idx+1} of 28 · ${SPRINTS[d.si].name} · about ${d.m} min</div><h2>${esc(d.t)}</h2>${tasksHtml(d,"x")}${linksHtml(d.links)}`}
+  $("today").innerHTML=t;
+  const doneT=Object.keys(S.done).filter(k=>S.done[k]).length;
+  $("sDays").textContent=`${DAYS.filter(dayDone).length} / 28`;
+  $("sTasks").textContent=`${doneT} / ${totalTasks}`;
+  $("sBar").style.width=(doneT/totalTasks*100)+"%";
+  $("sBest").textContent=S.scores.length?Math.max(...S.scores.map(s=>s.pct))+"%":"—";
+  $("sReady").textContent=ready()?"Book it":"Not yet";
+  $("sReady").style.color=ready()?"var(--good)":"";
+}
+document.addEventListener("change",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;S.done[k]=e.target.checked;save();renderPlan()});
+$("reset").addEventListener("click",()=>{$("resetConfirm").hidden=false});
+$("resetNo").addEventListener("click",()=>{$("resetConfirm").hidden=true});
+$("resetYes").addEventListener("click",()=>{S.done={};S.scores=[];S.mock=null;S.lastMock=null;save();$("resetConfirm").hidden=true;renderAll()});
+
+// ---------- scores
+function renderScores(){
+  const list=S.scores,msg=$("readyMsg");
+  if(!list.length){msg.className="ready no";msg.textContent="Log your practice scores to track readiness."}
+  else if(ready()){msg.className="ready yes";msg.textContent="Last 3 scores are all 95%+. You're ready to book PSPO I."}
+  else{let n=0;for(let i=list.length-1;i>=0&&list[i].pct>=95;i--)n++;msg.className="ready no";msg.textContent=`${n} of 3 scores in a row at 95%+. Keep going.`}
+  $("scoreList").innerHTML=list.map((s,i)=>`<li><span class="mono muted">${esc(s.date)}</span><span>${esc(s.src)}</span><span class="mono" style="color:${s.pct>=95?"var(--good)":s.pct>=85?"var(--ink)":"var(--bad)"}">${s.pct}%</span><button class="x" data-del="${i}" type="button" aria-label="Delete score">×</button></li>`).reverse().join("");
+  const W=600,H=170,l=34,r=8,top=10,b=24,show=list.slice(-14),y=v=>top+(100-v)/50*(H-top-b);
+  let g="";
+  [50,85,95,100].forEach(v=>{const c=v===85?"var(--bad)":v===95?"var(--good)":"var(--line)";g+=`<line x1="${l}" x2="${W-r}" y1="${y(v)}" y2="${y(v)}" stroke="${c}" stroke-dasharray="${v===85||v===95?"4 4":"0"}"/><text x="${l-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`});
+  if(!show.length)g+=`<text x="${W/2}" y="${H/2}" text-anchor="middle">Scores you log appear here</text>`;
+  const bw=(W-l-r)/14;
+  show.forEach((s,i)=>{const v=Math.max(50,s.pct),x=l+i*bw+bw*.2;
+    g+=`<rect x="${x}" y="${y(v)}" width="${bw*.6}" height="${Math.max(y(50)-y(v),1)}" rx="3" fill="${s.pct>=95?"var(--good)":s.pct>=85?"var(--accent)":"var(--bad)"}"/><text x="${x+bw*.3}" y="${H-8}" text-anchor="middle">${s.pct}</text>`});
+  g+=`<text x="${W-r}" y="${y(85)-4}" text-anchor="end" style="fill:var(--bad)">pass 85</text><text x="${W-r}" y="${y(95)-4}" text-anchor="end" style="fill:var(--good)">ready 95</text>`;
+  $("chart").innerHTML=g;
+}
+$("scoreForm").addEventListener("submit",e=>{e.preventDefault();const v=Math.round(Number($("pct").value));if(isNaN(v)||v<0||v>100)return;
+  S.scores.push({date:iso(new Date()),src:$("src").value,pct:v});$("pct").value="";save();renderAll()});
+$("scoreList").addEventListener("click",e=>{const i=e.target.dataset.del;if(i==null)return;S.scores.splice(Number(i),1);save();renderAll()});
+
+// ---------- quick check
+let qOrder=[],qi=0,qRight=0,qPerm=[];
+function startQuick(){qOrder=shuffle(range(BANK.length)).slice(0,8);qi=0;qRight=0;showQuick()}
+function showQuick(){
+  const box=$("qBox");
+  if(qi>=qOrder.length){box.innerHTML=`<h3>You got ${qRight} of ${qOrder.length}</h3><p class="muted">${qRight===qOrder.length?"Perfect. These rules are solid.":"Re-read the guide or Cheat sheet sections behind the ones you missed."}</p><div><button class="btn" id="again" type="button">Try another set</button></div>`;$("again").onclick=startQuick;return}
+  const q=BANK[qOrder[qi]];qPerm=shuffle(range(q[2].length));
+  box.innerHTML=`<span class="label">Question ${qi+1} of ${qOrder.length} · ${esc(q[0])}</span><h3>${esc(q[1])}</h3><div class="opts">${qPerm.map(o=>`<button class="opt" type="button" data-o="${o}">${esc(q[2][o])}</button>`).join("")}</div><div id="fb"></div>`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const o=Number(b.dataset.o);box.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.dataset.o==="0")x.classList.add("right")});
+    if(o===0)qRight++;else b.classList.add("wrong");
+    $("fb").innerHTML=`<p class="explain"><strong>${o===0?"Correct.":"Not quite."}</strong> ${esc(q[3])}</p><div style="margin-top:10px"><button class="btn" id="next" type="button">${qi+1<qOrder.length?"Next question":"See result"}</button></div>`;
+    $("next").onclick=()=>{qi++;showQuick()};
+  });
+}
+
+// ---------- timed mock
+let tick=null,cur=0,confirmSubmit=false;
+function newMock(){
+  const ids=shuffle(range(BANK.length)).slice(0,Math.min(MOCK_N,BANK.length));
+  S.mock={ids,perm:ids.map(id=>shuffle(range(BANK[id][2].length))),ans:{},flag:{},end:Date.now()+MOCK_MS};
+  cur=0;confirmSubmit=false;save();renderMock();
+}
+function finishMock(){
+  const m=S.mock;if(!m)return;
+  const byTopic={},wrong=[];let right=0;
+  m.ids.forEach((id,i)=>{const t=BANK[id][0];byTopic[t]=byTopic[t]||[0,0];byTopic[t][1]++;
+    if(m.ans[i]===0){right++;byTopic[t][0]++}else wrong.push({id,picked:m.ans[i]})});
+  const pct=Math.round(right/m.ids.length*100);
+  S.lastMock={pct,right,total:m.ids.length,byTopic,wrong,date:iso(new Date()),unanswered:m.ids.length-Object.keys(m.ans).length};
+  S.scores.push({date:iso(new Date()),src:"In-app timed mock",pct});
+  S.mock=null;save();clearInterval(tick);tick=null;renderAll();
+  $("mockPanel").scrollIntoView({block:"start"});
+}
+function fmtTime(ms){ms=Math.max(0,ms);const s=Math.ceil(ms/1000);return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`}
+function startTick(){if(tick)return;tick=setInterval(()=>{if(!S.mock){clearInterval(tick);tick=null;return}
+  const left=S.mock.end-Date.now(),el=$("timer");if(el){el.textContent=fmtTime(left);el.classList.toggle("low",left<5*60000)}
+  if(left<=0)finishMock()},1000)}
+
+function renderMock(){
+  const P=$("mockPanel"),m=S.mock;
+  if(m&&Date.now()>=m.end){finishMock();return}
+  if(!m){
+    const r=S.lastMock;
+    let h=`<h2>Timed mock exam</h2><p class="muted">${Math.min(MOCK_N,BANK.length)} questions in 60 minutes, drawn from a bank of ${BANK.length} and reshuffled every attempt. Same length and pass mark (85%) as the real exam. Your score is logged automatically.</p>`;
+    if(r){
+      const pass=r.pct>=85;
+      h+=`<div class="ready ${r.pct>=95?"yes":pass?"no":"fail"}">Last attempt (${esc(r.date)}): ${r.right} of ${r.total} correct · <span class="mono">${r.pct}%</span> · ${r.pct>=95?"Exam-ready score":pass?"Pass, aim for 95% before booking":"Below the 85% pass mark"}${r.unanswered?` · ${r.unanswered} unanswered`:""}</div>
+      <h3>Score by topic</h3><div class="topics">${Object.entries(r.byTopic).sort((a,b)=>a[1][0]/a[1][1]-b[1][0]/b[1][1]).map(([t,[c,n]])=>{const p=Math.round(c/n*100);return `<div class="topic"><span>${esc(t)}</span><div class="bar"><i style="width:${p}%;background:${p>=95?"var(--good)":p>=85?"var(--accent)":"var(--bad)"}"></i></div><span class="mono">${c}/${n}</span></div>`}).join("")}</div>`;
+      if(r.wrong.length)h+=`<details><summary><strong>Review ${r.wrong.length} wrong or skipped answer${r.wrong.length===1?"":"s"}</strong></summary><div class="review">${r.wrong.map(w=>{const q=BANK[w.id];return `<article><span class="label">${esc(q[0])}</span><strong>${esc(q[1])}</strong><span style="color:var(--bad)">Your answer: ${w.picked==null?"(skipped)":esc(q[2][w.picked])}</span><span style="color:var(--good)">Correct: ${esc(q[2][0])}</span><p class="muted">${esc(q[3])}</p></article>`}).join("")}</div></details>`;
+    }
+    h+=`<div class="row"><button class="btn" id="mockStart" type="button">${r?"Start a new mock":"Start mock exam"}</button><span class="muted">Find a quiet hour first. The timer keeps running if you close the page.</span></div>`;
+    P.innerHTML=h;$("mockStart").onclick=newMock;return;
+  }
+  const n=m.ids.length;cur=Math.min(Math.max(cur,0),n-1);
+  const id=m.ids[cur],q=BANK[id],answered=Object.keys(m.ans).length;
+  P.innerHTML=`<div class="mockbar"><div><span class="label">Time left</span><div class="timer" id="timer">${fmtTime(m.end-Date.now())}</div></div>
+    <span class="mono">${answered} / ${n} answered</span>
+    <div class="row">${confirmSubmit?`<span>${n-answered?`${n-answered} unanswered. `:""}Submit now?</span><button class="btn" id="subYes" type="button">Submit</button><button class="btn ghost" id="subNo" type="button">Keep going</button>`:`<button class="btn" id="sub" type="button">Finish exam</button>`}</div></div>
+    <div class="q"><span class="label">Question ${cur+1} of ${n}</span><h3>${esc(q[1])}</h3>
+    <div class="opts">${m.perm[cur].map(o=>`<button class="opt${m.ans[cur]===o?" picked":""}" type="button" data-o="${o}">${esc(q[2][o])}</button>`).join("")}</div>
+    <div class="row"><button class="btn ghost" id="prev" type="button" ${cur===0?"disabled":""}>Previous</button><button class="btn ghost" id="flag" type="button">${m.flag[cur]?"Unflag":"Flag for review"}</button><button class="btn" id="nextQ" type="button" ${cur===n-1?"disabled":""}>Next</button></div></div>
+    <div><span class="label">Jump to question</span><div class="navgrid" style="margin-top:8px">${range(n).map(i=>`<button class="nav${m.ans[i]!=null?" ans":""}${m.flag[i]?" flag":""}${i===cur?" cur":""}" type="button" data-go="${i}" aria-label="Question ${i+1}">${i+1}</button>`).join("")}</div>
+    <p class="muted" style="font-size:14px;margin-top:8px">Filled = answered. Underlined = flagged.</p></div>`;
+  P.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{m.ans[cur]=Number(b.dataset.o);save();if(cur<n-1)cur++;renderMock()});
+  P.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{cur=Number(b.dataset.go);renderMock()});
+  $("prev").onclick=()=>{cur--;renderMock()};$("nextQ").onclick=()=>{cur++;renderMock()};
+  $("flag").onclick=()=>{m.flag[cur]=!m.flag[cur];save();renderMock()};
+  if(confirmSubmit){$("subYes").onclick=()=>{confirmSubmit=false;finishMock()};$("subNo").onclick=()=>{confirmSubmit=false;renderMock()}}
+  else $("sub").onclick=()=>{confirmSubmit=true;renderMock()};
+  startTick();
+}
+
+function renderAll(){renderPlan();renderScores();renderMock()}
+renderAll();startQuick();
+})();
+</script>
+</body>
+</html>
