@@ -25,6 +25,7 @@
   --accent:#4FC2C9; --accent-soft:#16363C; --today:#F0B455; --today-soft:#3A2D16;
   --good:#5FCB8A; --good-soft:#173826; --bad:#F0827A; --bad-soft:#3E1D1B; color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .wrap{max-width:1080px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
@@ -131,6 +132,35 @@ td.mono{white-space:nowrap}
 .cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .mini{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px;background:var(--bg)}
 .list{margin:0;padding-left:18px;display:grid;gap:4px}
+/* notes */
+.linkbtn{border:0;background:none;color:var(--accent);padding:0;font-size:14px;font-weight:600;justify-self:start}
+.notes{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:16px;align-items:start}
+@media (max-width:720px){.notes{grid-template-columns:1fr}}
+.notelist{display:grid;gap:6px;max-height:60vh;overflow:auto}
+.noteitem{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;display:grid;gap:2px;min-width:0}
+.noteitem.cur{border-color:var(--accent);background:var(--accent-soft)}
+.noteitem strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.noteitem span{font-size:13px;color:var(--muted)}
+.editor{display:grid;gap:10px;min-width:0}
+.editor input,.editor textarea{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px}
+.editor textarea{min-height:340px;resize:vertical;line-height:1.55}
+.editor input{font-family:var(--display);font-size:18px;font-weight:600}
+
+/* chat */
+.chat{display:grid;gap:12px}
+.msgs{display:grid;gap:10px;max-height:62vh;overflow:auto;padding:4px}
+.msg{max-width:85%;border-radius:12px;padding:10px 14px;display:grid;gap:6px;min-width:0;overflow-wrap:anywhere}
+.msg.user{justify-self:end;background:var(--accent);color:var(--surface)}
+.msg.bot{justify-self:start;background:var(--bg);border:1px solid var(--line)}
+.msg ul{margin:0;padding-left:18px}
+.msg .src{font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chipbtn{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px;font-size:14px}
+.chipbtn:hover{border-color:var(--accent)}
+.composer{display:flex;gap:8px}
+.composer textarea{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 12px;resize:vertical;min-height:44px}
+.keybox{border:1px dashed var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:8px;font-size:15px}
+.keybox input{flex:1;min-width:0}
 footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
@@ -147,6 +177,8 @@ footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16p
     <button class="tab" role="tab" data-tab="plan" id="tab-plan" type="button">Plan</button>
     <button class="tab" role="tab" data-tab="cheatsheet" id="tab-cheatsheet" type="button">Cheat sheet</button>
     <button class="tab" role="tab" data-tab="practice" id="tab-practice" type="button">Practice &amp; mock exam</button>
+    <button class="tab" role="tab" data-tab="notes" id="tab-notes" type="button">Notes</button>
+    <button class="tab" role="tab" data-tab="ask" id="tab-ask" type="button">Study buddy</button>
   </nav>
 
   <!-- PLAN -->
@@ -299,7 +331,38 @@ footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16p
     </section>
   </div>
 
-  <footer><span>Progress is saved in this browser only.</span><span>Practice questions are original, based on the 2020 Scrum Guide. They are not real exam questions.</span></footer>
+  <!-- NOTES -->
+  <div class="view" id="view-notes" hidden>
+    <p class="intro">Keep your own notes here. They save automatically as you type, and the Study buddy can read them to answer questions about what you've written.</p>
+    <div class="notes">
+      <div style="display:grid;gap:10px;min-width:0">
+        <div class="row"><button class="btn" id="noteNew" type="button">New note</button><button class="btn ghost" id="noteCopy" type="button">Copy all</button></div>
+        <input class="field" id="noteSearch" type="search" placeholder="Search notes" aria-label="Search notes">
+        <div class="notelist" id="noteList"></div>
+      </div>
+      <div class="panel editor" id="noteEditor"></div>
+    </div>
+    <textarea id="copyFallback" class="field" readonly hidden style="min-height:160px"></textarea>
+  </div>
+
+  <!-- STUDY BUDDY -->
+  <div class="view" id="view-ask" hidden>
+    <section class="panel chat">
+      <div class="row" style="justify-content:space-between"><h2>Study buddy</h2><div class="row"><span class="muted" id="aiMode" style="font-size:14px"></span><button class="btn ghost" id="chatClear" type="button">Clear chat</button></div></div>
+      <p class="muted">Ask anything about PSPO I, CSPO or the Scrum Guide. It knows this app's plan, cheat sheet, question bank, your scores and your notes.</p>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <form class="composer" id="chatForm"><textarea id="chatIn" rows="2" placeholder="Ask a question, or say “quiz me on events”" aria-label="Your question"></textarea><button class="btn" type="submit" id="chatSend">Send</button></form>
+      <details class="keybox" id="keyBox">
+        <summary><strong>AI settings</strong> <span class="muted" id="keyState"></span></summary>
+        <p>Without a key, the Study buddy searches this app's study material and shows the closest matches. For full conversations, add a Claude API key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Usage is billed to that account, so set a monthly spend limit there.</p>
+        <p class="muted" style="font-size:14px">The key is stored only in this browser and is sent only to Anthropic. Never put it in the GitHub files.</p>
+        <div class="row"><input class="field" id="keyIn" type="password" placeholder="sk-ant-..." autocomplete="off" aria-label="API key"><select class="field" id="modelIn" aria-label="Model"><option value="claude-haiku-5-5">Faster, lower cost</option><option value="claude-sonnet-5-5">Smarter</option></select><button class="btn" id="keySave" type="button">Save key</button><button class="btn ghost" id="keyDel" type="button">Remove key</button></div>
+      </details>
+    </section>
+  </div>
+
+  <footer><span>Progress and notes are saved in this browser only.</span><span>Practice questions are original, based on the 2020 Scrum Guide. They are not real exam questions.</span></footer>
 </div>
 
 <script>
@@ -446,12 +509,12 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const range=n=>Array.from({length:n},(_,i)=>i);
 const $=id=>document.getElementById(id);
 
-let S={start:iso(today),done:{},scores:[],mock:null,lastMock:null};
+let S={start:iso(today),done:{},scores:[],mock:null,lastMock:null,notes:[],chat:[]};
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 
 // ---------- tabs
-const TABS=["plan","cheatsheet","practice"];
+const TABS=["plan","cheatsheet","practice","notes","ask"];
 function showTab(t,scroll){if(!TABS.includes(t))t="plan";
   TABS.forEach(x=>{$("view-"+x).hidden=x!==t;$("tab-"+x).setAttribute("aria-selected",String(x===t))});
   if(scroll)window.scrollTo({top:0});}
@@ -476,7 +539,7 @@ function renderPlan(){
     <div class="sprint-head"><h2>${s.name}</h2><span class="label mono">${fmt(addDays(start,si*7))} – ${fmt(addDays(start,si*7+6))}</span></div>
     <p class="goal"><strong>Sprint Goal:</strong> ${esc(s.goal)}</p>
     <div class="days">${s.days.map((_,di)=>{const d=DAYS[si*7+di],done=dayDone(d),cls=(d.n===idx?" is-today":"")+(done?" is-done":"");
-      return `<article class="day${cls}"><div class="day-top"><span class="label">Day ${d.n+1} · ${fmt(addDays(start,d.n))}</span><span class="chip">${done?"Done":d.n===idx?"Today":d.m+" min"}</span></div><h3>${esc(d.t)}</h3>${tasksHtml(d,"t")}${linksHtml(d.links)}</article>`}).join("")}</div></section>`).join("");
+      return `<article class="day${cls}"><div class="day-top"><span class="label">Day ${d.n+1} · ${fmt(addDays(start,d.n))}</span><span class="chip">${done?"Done":d.n===idx?"Today":d.m+" min"}</span></div><h3>${esc(d.t)}</h3>${tasksHtml(d,"t")}${linksHtml(d.links)}<button class="linkbtn" type="button" data-daynote="${d.n}">${noteForDay(d.n)?"Open note":"+ Add note"}</button></article>`}).join("")}</div></section>`).join("");
   let t;
   if(idx<0)t=`<div class="label">Coming up</div><h2>Your plan starts in ${-idx} day${idx===-1?"":"s"}</h2><p>First up: ${esc(DAYS[0].t)}.</p>`;
   else if(idx>27)t=`<div class="label">Plan complete</div><h2>${ready()?"You're ready. Go book the exam.":"The 28 days are over"}</h2><p>${ready()?"Your last three scores are all 95% or higher.":"Keep practising until your last three scores are 95%+, or change the start date to restart."}</p>`;
@@ -589,8 +652,129 @@ function renderMock(){
   startTick();
 }
 
+// ---------- notes
+let curNote=null,noteQuery="",noteTimer=null,copyMsg="";
+const noteForDay=n=>S.notes.find(x=>x.day===n);
+const nowStamp=()=>new Date().toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+function makeNote(title,day){const n={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,body:"",day,updated:nowStamp()};S.notes.unshift(n);save();return n}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-daynote]");if(!b)return;const n=Number(b.dataset.daynote);
+  let note=noteForDay(n);if(!note)note=makeNote(`Day ${n+1}: ${DAYS[n].t}`,n);curNote=note.id;renderNotes();showTab("notes",true);renderPlan()});
+function renderNotes(){
+  const q=noteQuery.toLowerCase(),list=S.notes.filter(n=>!q||(n.title+" "+n.body).toLowerCase().includes(q));
+  if(!curNote&&S.notes.length)curNote=S.notes[0].id;
+  $("noteList").innerHTML=list.length?list.map(n=>`<button class="noteitem${n.id===curNote?" cur":""}" type="button" data-note="${n.id}"><strong>${esc(n.title||"Untitled")}</strong><span>${esc(n.updated)}</span></button>`).join(""):`<p class="muted">${S.notes.length?"No notes match.":"No notes yet."}</p>`;
+  const n=S.notes.find(x=>x.id===curNote),ed=$("noteEditor");
+  if(!n){ed.innerHTML=`<h3>Start your first note</h3><p class="muted">Try a page of rules in your own words, questions you got wrong, or a "workplace vs Scrum Guide" list. You can also add a note from any day card in the Plan.</p>`;return}
+  ed.innerHTML=`<input id="noteTitle" value="${esc(n.title)}" aria-label="Note title" placeholder="Title"><textarea id="noteBody" aria-label="Note text" placeholder="Write here. It saves automatically.">${esc(n.body)}</textarea>
+   <div class="row" style="justify-content:space-between"><span class="muted" id="noteSaved" style="font-size:14px">Saved · ${esc(n.updated)}</span>
+   <span class="row" id="noteDelBox"><button class="btn ghost" id="noteDel" type="button">Delete note</button></span></div>`;
+  const upd=()=>{n.title=$("noteTitle").value;n.body=$("noteBody").value;n.updated=nowStamp();$("noteSaved").textContent="Saving…";
+    clearTimeout(noteTimer);noteTimer=setTimeout(()=>{save();$("noteSaved").textContent="Saved · "+n.updated;
+      const it=document.querySelector(`[data-note="${n.id}"] strong`);if(it)it.textContent=n.title||"Untitled"},400)};
+  $("noteTitle").oninput=upd;$("noteBody").oninput=upd;
+  $("noteDel").onclick=()=>{$("noteDelBox").innerHTML=`<span>Delete this note?</span><button class="btn" id="ndYes" type="button">Delete</button><button class="btn ghost" id="ndNo" type="button">Keep</button>`;
+    $("ndYes").onclick=()=>{S.notes=S.notes.filter(x=>x.id!==n.id);curNote=null;save();renderNotes();renderPlan()};$("ndNo").onclick=renderNotes};
+}
+$("noteList").addEventListener("click",e=>{const b=e.target.closest("[data-note]");if(!b)return;curNote=b.dataset.note;renderNotes()});
+$("noteNew").onclick=()=>{const n=makeNote("New note",null);curNote=n.id;noteQuery="";$("noteSearch").value="";renderNotes();$("noteTitle").select()};
+$("noteSearch").oninput=e=>{noteQuery=e.target.value;renderNotes()};
+$("noteCopy").onclick=()=>{
+  const text=S.notes.map(n=>`${n.title}\n${"-".repeat(Math.min(40,n.title.length||5))}\n${n.body}`).join("\n\n");
+  const fb=$("copyFallback"),btn=$("noteCopy");
+  const showFallback=()=>{fb.value=text;fb.hidden=false;fb.focus();fb.select();btn.textContent="Select and copy below"};
+  if(!text){btn.textContent="No notes yet";return}
+  try{navigator.clipboard.writeText(text).then(()=>{btn.textContent="Copied";setTimeout(()=>btn.textContent="Copy all",1800)},showFallback)}catch(err){showFallback()}
+};
+
+// ---------- study buddy
+const KEY_API="pspo-study-plan-apikey";
+let apiKey="",model="claude-haiku-5-5",busy=false;
+try{apiKey=localStorage.getItem(KEY_API)||"";model=localStorage.getItem(KEY_API+"-model")||model}catch(e){}
+$("modelIn").value=model;
+function keyUi(){$("keyState").textContent=apiKey?"· key saved":"· no key, offline search mode";$("aiMode").textContent=apiKey?"AI chat on":"Offline search";$("keyIn").value="";$("keyIn").placeholder=apiKey?"Key saved (hidden)":"sk-ant-..."}
+$("keySave").onclick=()=>{const v=$("keyIn").value.trim();model=$("modelIn").value;if(v)apiKey=v;try{if(apiKey)localStorage.setItem(KEY_API,apiKey);localStorage.setItem(KEY_API+"-model",model)}catch(e){}keyUi()};
+$("keyDel").onclick=()=>{apiKey="";try{localStorage.removeItem(KEY_API)}catch(e){}keyUi()};
+$("modelIn").onchange=e=>{model=e.target.value;try{localStorage.setItem(KEY_API+"-model",model)}catch(err){}};
+
+const CHIPS=["What should I study today?","Quiz me on the Scrum events","Sprint Goal vs Product Goal?","How is CSPO different from PSPO I?","What are my weakest topics?","Explain EBM simply"];
+$("chips").innerHTML=CHIPS.map(c=>`<button class="chipbtn" type="button">${esc(c)}</button>`).join("");
+$("chips").addEventListener("click",e=>{const b=e.target.closest(".chipbtn");if(b)send(b.textContent)});
+
+function md(t){ // tiny, safe markdown: escape first, then bold, bullets, paragraphs
+  const lines=esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").split("\n");let out="",inList=false;
+  lines.forEach(l=>{const m=l.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)/);
+    if(m){if(!inList){out+="<ul>";inList=true}out+=`<li>${m[1]}</li>`}
+    else{if(inList){out+="</ul>";inList=false}if(l.trim())out+=`<p>${l}</p>`}});
+  return out+(inList?"</ul>":"");
+}
+function renderChat(){
+  const box=$("msgs");
+  box.innerHTML=S.chat.length?S.chat.map(m=>`<div class="msg ${m.role==="user"?"user":"bot"}">${m.role==="user"?`<p>${esc(m.content)}</p>`:md(m.content)}${m.src?`<span class="src">${esc(m.src)}</span>`:""}</div>`).join("")
+   :`<div class="msg bot"><p>Hi! I'm your PSPO study buddy. Ask me to explain a rule, quiz you, or check what to study today.</p></div>`;
+  if(busy)box.innerHTML+=`<div class="msg bot"><p class="muted">Thinking…</p></div>`;
+  box.scrollTop=box.scrollHeight;$("chatSend").disabled=busy;
+}
+$("chatClear").onclick=()=>{S.chat=[];save();renderChat()};
+$("chatForm").addEventListener("submit",e=>{e.preventDefault();send($("chatIn").value)});
+$("chatIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send($("chatIn").value)}});
+
+function studyContext(){
+  const start=parse(S.start),idx=Math.round((today-start)/864e5);
+  const plan=DAYS.map(d=>`Day ${d.n+1} (${iso(addDays(start,d.n))}, ${SPRINTS[d.si].name}) ${d.t} [${dayDone(d)?"done":"not done"}]: ${d.tasks.join("; ")}`).join("\n");
+  const sheet=$("view-cheatsheet").textContent.replace(/\s+/g," ").trim();
+  const bank=BANK.map((q,i)=>`${i+1}. [${q[0]}] ${q[1]} Correct: ${q[2][0]}. Why: ${q[3]}`).join("\n");
+  const scores=S.scores.length?S.scores.map(s=>`${s.date} ${s.src}: ${s.pct}%`).join("\n"):"No scores logged yet.";
+  const lm=S.lastMock?`Last mock ${S.lastMock.date}: ${S.lastMock.pct}%. By topic: `+Object.entries(S.lastMock.byTopic).map(([t,[c,n]])=>`${t} ${c}/${n}`).join(", "):"No mock exam taken yet.";
+  let notes=S.notes.map(n=>`# ${n.title}\n${n.body}`).join("\n\n");if(notes.length>8000)notes=notes.slice(0,8000)+"\n[notes truncated]";
+  return `TODAY: ${iso(new Date())}. Plan start ${S.start}; today is ${idx<0?`${-idx} days before the plan starts`:idx>27?"after the 28-day plan":`Day ${idx+1}`}.\n\n== 28-DAY PLAN ==\n${plan}\n\n== CHEAT SHEET ==\n${sheet}\n\n== QUESTION BANK ==\n${bank}\n\n== LEARNER'S SCORES ==\n${scores}\n${lm}\n\n== LEARNER'S NOTES ==\n${notes||"No notes yet."}`;
+}
+const SYSTEM=`You are a friendly, encouraging study coach inside a PSPO I study app. You help one learner prepare for the Professional Scrum Product Owner I exam (Scrum.org) and understand the Certified Scrum Product Owner (CSPO, Scrum Alliance) credential and Product Owner work in general.
+Rules:
+- Base Scrum rules on the 2020 Scrum Guide and Scrum.org's Evidence-Based Management guide. When common workplace practice differs, give the guide's answer and say so.
+- Say clearly when something (user stories, story points, velocity, Definition of Ready) is a complementary practice, not part of Scrum.
+- Keep answers short and plain: usually under 150 words, with short bullet lists when helpful.
+- To quiz: ask ONE multiple-choice question at a time, wait for the answer, then say if it's right and explain briefly.
+- Use the app content below (plan, cheat sheet, question bank, the learner's scores and notes) to personalise help, e.g. today's tasks or weakest topics.
+- For current prices, exam policies or course details, say they may have changed and to check scrum.org or scrumalliance.org.
+- Stay on studying, Scrum, product ownership and related career questions.`;
+
+function offlineAnswer(q){
+  const words=q.toLowerCase().match(/[a-z]{4,}/g)||[];
+  const stop=new Set(["what","when","which","does","about","with","from","that","this","have","should","would","there","their","explain","between","quiz","study","today","simply","different","difference"]);
+  const terms=words.filter(w=>!stop.has(w));
+  if(!terms.length)return {content:"I'm in offline search mode, so I can only look things up in this app's study material. Try a topic word, like “Sprint Review”, “Definition of Done” or “EBM”. For full conversations, add an API key in AI settings below.",src:""};
+  const docs=[];
+  document.querySelectorAll("#view-cheatsheet tr, #view-cheatsheet li, #view-cheatsheet .mini").forEach(el=>{const t=el.textContent.replace(/\s+/g," ").trim();if(t&&!/^(who|event|artifact|area)\b/i.test(t))docs.push({t,src:"Cheat sheet"})});
+  BANK.forEach(b=>docs.push({t:`${b[1]} Answer: ${b[2][0]}. ${b[3]}`,src:`Question bank · ${b[0]}`}));
+  const scored=docs.map(d=>{const l=d.t.toLowerCase();return {...d,s:terms.reduce((a,w)=>a+(l.includes(w)?1:0),0)}}).filter(d=>d.s>0).sort((a,b)=>b.s-a.s).slice(0,3);
+  if(!scored.length)return {content:"I couldn't find that in the study material. Try different words, or add an API key in AI settings for full answers.",src:""};
+  return {content:"Here's what the study material says:\n"+scored.map(d=>`- ${d.t}`).join("\n"),src:"Offline search · "+[...new Set(scored.map(d=>d.src))].join(", ")};
+}
+async function send(text){
+  text=(text||"").trim();if(!text||busy)return;
+  $("chatIn").value="";S.chat.push({role:"user",content:text});busy=true;renderChat();
+  if(!apiKey){const a=offlineAnswer(text);S.chat.push({role:"assistant",...a});busy=false;save();renderChat();return}
+  const history=[];
+  S.chat.filter(m=>!m.local).slice(-20).forEach(m=>{const last=history[history.length-1];
+    if(last&&last.role===m.role)last.content+="\n\n"+m.content;else history.push({role:m.role,content:m.content})});
+  while(history.length&&history[0].role!=="user")history.shift();
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model,max_tokens:1024,system:SYSTEM+"\n\n"+studyContext(),messages:history})});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok){const why=r.status===401?"The API key was rejected. Check it in AI settings.":r.status===429?"Too many requests or the spend limit was reached. Try again shortly.":(data.error&&data.error.message)||`The AI service returned an error (${r.status}).`;throw new Error(why)}
+    const out=(data.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("\n").trim()||"(No answer came back. Try asking again.)";
+    S.chat.push({role:"assistant",content:out});
+  }catch(err){
+    const a=offlineAnswer(text);
+    S.chat.push({role:"assistant",local:true,content:`${err.message&&!/fetch|network|load/i.test(err.message)?err.message:"I couldn't reach the AI service, so here's an offline search instead."}\n\n${a.content}`,src:a.src||"Offline search"});
+  }
+  if(S.chat.length>60)S.chat=S.chat.slice(-60);
+  busy=false;save();renderChat();
+}
+
 function renderAll(){renderPlan();renderScores();renderMock()}
-renderAll();startQuick();
+renderAll();startQuick();renderNotes();keyUi();renderChat();
 })();
 </script>
 </body>

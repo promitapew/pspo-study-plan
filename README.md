@@ -9,7 +9,13 @@ A 4-week, day-by-day study planner for the Professional Scrum Product Owner I (P
 - Cheat sheet tab: accountabilities, events and timeboxes, artifacts and commitments, EBM Key Value Areas, common traps
 - Timed mock exam: 80 questions in 60 minutes from a bank of 91 original questions, with topic breakdown and answer review; scores log automatically
 - Quick-check quiz with instant explanations
+- Notes tab: multiple notes, autosave, search, copy all; add a note from any day card
+- Study buddy: chat that knows the plan, cheat sheet, question bank, your scores and notes
+  - Without a key it searches the app's study material (offline)
+  - With a Claude API key (from console.anthropic.com) it becomes a full AI tutor; the key is stored only in your browser
 - Progress is saved in your browser (no account, no server)
+
+> Never put an API key in the files you upload to GitHub. Enter it only in the app's AI settings.
 
 ## Publish it on GitHub Pages
 
