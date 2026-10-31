@@ -728,13 +728,13 @@ $("noteCopy").onclick=()=>{
 };
 
 // ---------- page question bank
-const QTYPES={all:"All",single:"Single choice",multi:"Choose two or more",tf:"True or false",blank:"Fill in the blank",order:"Put in order"};
+const QTYPES={all:"All",scenario:"Scenarios",single:"Single choice",multi:"Choose two or more",tf:"True or false",blank:"Fill in the blank",order:"Put in order"};
 let qbSet=PSETS.length?PSETS[PSETS.length-1].id:null,qbType="all",qbList=[],qbPos=0,qbSel=[],qbPerm=[],qbDone=false;
 const qbId=(set,i)=>set.id+"#"+i;
 const curSet=()=>PSETS.find(x=>x.id===qbSet);
 function qbBuild(keepPos){
   const set=curSet();if(!set){qbList=[];return}
-  let l=set.qs.map((q,i)=>i).filter(i=>qbType==="all"||set.qs[i].type===qbType);
+  let l=set.qs.map((q,i)=>i).filter(i=>qbType==="all"||(qbType==="scenario"?set.qs[i].sc:set.qs[i].type===qbType));
   if($("qbWrong").checked)l=l.filter(i=>S.qb[qbId(set,i)]!==true);
   if($("qbShuffle").checked)l=shuffle(l);
   qbList=l;if(!keepPos)qbPos=0;qbPos=Math.min(qbPos,Math.max(0,l.length-1));
@@ -743,18 +743,18 @@ function renderQbHead(){
   $("qbSets").innerHTML=PSETS.map(s=>{const n=s.qs.length,ok=s.qs.filter((q,i)=>S.qb[qbId(s,i)]===true).length;
     return `<button class="setbtn${s.id===qbSet?" cur":""}" type="button" data-set="${s.id}"><strong>${esc(s.title)}</strong><span>${esc(s.sub)}</span><span>${ok} of ${n} correct</span></button>`}).join("")||`<p class="muted">No question sets yet.</p>`;
   const set=curSet();if(!set)return;
-  $("qbTypes").innerHTML=Object.entries(QTYPES).map(([k,v])=>{const c=k==="all"?set.qs.length:set.qs.filter(q=>q.type===k).length;
+  $("qbTypes").innerHTML=Object.entries(QTYPES).map(([k,v])=>{const c=k==="all"?set.qs.length:k==="scenario"?set.qs.filter(q=>q.sc).length:set.qs.filter(q=>q.type===k).length;
     return c?`<button class="chipbtn${k===qbType?" cur":""}" type="button" data-type="${k}">${v} (${c})</button>`:""}).join("");
   const ids=set.qs.map((q,i)=>qbId(set,i)),tried=ids.filter(i=>i in S.qb).length,ok=ids.filter(i=>S.qb[i]===true).length;
   $("qbStats").innerHTML=`<span>Questions <b>${set.qs.length}</b></span><span>Tried <b>${tried}</b></span><span>Correct <b>${ok}</b></span><span>Missed <b>${tried-ok}</b></span>${tried?`<span>Accuracy <b>${Math.round(ok/tried*100)}%</b></span>`:""}`;
-  $("qbAll").innerHTML=set.qs.map((q,i)=>`<article><span class="row"><span class="typetag">${QTYPES[q.type]}</span><span class="label">${esc(q.topic)}</span></span><strong>${i+1}. ${esc(q.q)}</strong><span class="ans">${q.type==="order"?q.items.map((t,k)=>`${k+1}. ${esc(t)}`).join("<br>"):esc(q.a.join(" · "))}</span><span class="muted">${esc(q.why)}</span></article>`).join("");
+  $("qbAll").innerHTML=set.qs.map((q,i)=>`<article><span class="row">${q.sc?`<span class="typetag">Scenario</span>`:""}<span class="typetag">${QTYPES[q.type]}</span><span class="label">${esc(q.topic)}</span></span><strong>${i+1}. ${esc(q.q)}</strong><span class="ans">${q.type==="order"?q.items.map((t,k)=>`${k+1}. ${esc(t)}`).join("<br>"):esc(q.a.join(" · "))}</span><span class="muted">${esc(q.why)}</span></article>`).join("");
 }
 function renderQb(){
   renderQbHead();const box=$("qbBox"),set=curSet();
   if(!set){box.innerHTML="";return}
   if(!qbList.length){box.innerHTML=`<h3>Nothing to show</h3><p class="muted">${$("qbWrong").checked?"You've answered every question in this filter correctly. Untick \"Only questions I missed\" to go through them again.":"No questions of this type in this set yet."}</p>`;return}
   const i=qbList[qbPos],q=set.qs[i],id=qbId(set,i);qbSel=[];qbDone=false;
-  const head=`<div class="row" style="justify-content:space-between"><span class="label">Question ${qbPos+1} of ${qbList.length} · ${esc(q.topic)}</span><span class="typetag">${QTYPES[q.type]}</span></div><h3>${esc(q.q)}</h3>`;
+  const head=`<div class="row" style="justify-content:space-between"><span class="label">Question ${qbPos+1} of ${qbList.length} · ${esc(q.topic)}</span><span class="row" style="gap:6px">${q.sc?`<span class="typetag">Scenario</span>`:""}<span class="typetag">${QTYPES[q.type]}</span></span></div><h3>${esc(q.q)}</h3>`;
   const nav=`<div class="row" id="qbNav"><button class="btn ghost" id="qbPrev" type="button" ${qbPos===0?"disabled":""}>Previous</button><button class="btn" id="qbNext" type="button">${qbPos+1<qbList.length?"Next question":"Back to start"}</button></div>`;
   let opts;
   if(q.type==="order"){qbPerm=shuffle(range(q.items.length));if(qbPerm.every((v,k)=>v===k)&&q.items.length>1)qbPerm.reverse();
