@@ -126,6 +126,16 @@ svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
 .allq{display:grid;gap:10px}
 .allq article{border-bottom:1px solid var(--line);padding-bottom:10px;display:grid;gap:4px}
 .allq .ans{color:var(--good);font-weight:600}
+/* resources */
+.res{display:grid;gap:10px}
+.resitem{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg)}
+.resitem a{font-weight:700;color:var(--accent);text-decoration:none}
+.resitem a:hover{text-decoration:underline}
+.resitem p{grid-column:1/-1;margin:0;font-size:14px;color:var(--muted)}
+.tag{font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.tag.must{background:var(--today-soft);color:var(--ink)}
+.tag.free{background:var(--good-soft);color:var(--good)}
+.tag.paid{background:var(--accent-soft);color:var(--accent)}
 .facts{margin:0;padding-left:18px;display:grid;gap:4px}
 
 /* mock */
@@ -198,6 +208,7 @@ footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16p
     <button class="tab" role="tab" data-tab="cheatsheet" id="tab-cheatsheet" type="button">Cheat sheet</button>
     <button class="tab" role="tab" data-tab="practice" id="tab-practice" type="button">Practice &amp; mock exam</button>
     <button class="tab" role="tab" data-tab="qbank" id="tab-qbank" type="button">Question bank</button>
+    <button class="tab" role="tab" data-tab="resources" id="tab-resources" type="button">Resources</button>
     <button class="tab" role="tab" data-tab="notes" id="tab-notes" type="button">Notes</button>
     <button class="tab" role="tab" data-tab="ask" id="tab-ask" type="button">Study buddy</button>
   </nav>
@@ -345,11 +356,41 @@ footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16p
       <div class="links">
         <a href="https://scrumguides.org/scrum-guide.html" target="_blank" rel="noopener">Scrum Guide</a>
         <a href="https://www.scrum.org/open-assessments/product-owner-open" target="_blank" rel="noopener">Product Owner Open</a>
-        <a href="https://www.scrum.org/resources/evidence-based-management" target="_blank" rel="noopener">Evidence-Based Management</a>
+        <a href="https://www.scrum.org/resources/online-evidence-based-management-guide" target="_blank" rel="noopener">EBM Guide (free)</a>
         <a href="https://mlapshin.com/index.php/scrum-quizzes/" target="_blank" rel="noopener">Mikhail Lapshin quizzes</a>
         <a href="https://www.scrum.org/assessments/professional-scrum-product-owner-i-certification" target="_blank" rel="noopener">Buy PSPO I exam</a>
       </div>
     </section>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="view" id="view-resources" hidden>
+    <p class="intro">Everything you need is free. Start with the two must-reads, then practise. Paid items are optional extras.</p>
+    <div class="panels">
+      <section class="panel">
+        <h2>Free</h2>
+        <div class="res">
+        <div class="resitem"><a href="https://scrumguides.org/scrum-guide.html" target="_blank" rel="noopener">The Scrum Guide (2020)</a><span class="tag must">Must read</span><p>The main source for the exam, about 13 pages. Read it 3–4 times until you can answer from memory. Your printed pages are this guide.</p></div>
+        <div class="resitem"><a href="https://www.scrum.org/resources/online-evidence-based-management-guide" target="_blank" rel="noopener">Evidence-Based Management (EBM) Guide</a><span class="tag must">Must read</span><p>Read it online, no download or account needed. Covers the four Key Value Areas, Strategic, Intermediate and Immediate Tactical Goals, and measuring value. Directly tested on PSPO I. A PDF is on the <a href="https://www.scrum.org/resources/evidence-based-management-guide" target="_blank" rel="noopener">EBM Guide page</a> (may ask you to sign in to Scrum.org, which is free).</p></div>
+        <div class="resitem"><a href="https://www.scrum.org/open-assessments/product-owner-open" target="_blank" rel="noopener">Product Owner Open assessment</a><span class="tag free">Practice</span><p>Scrum.org's free practice test, closest to the real question style. Repeat until you score 100% several times in a row.</p></div>
+        <div class="resitem"><a href="https://www.scrum.org/open-assessments/scrum-open" target="_blank" rel="noopener">Scrum Open assessment</a><span class="tag free">Practice</span><p>Free practice test on the Scrum Guide. Good for checking the basics.</p></div>
+        <div class="resitem"><a href="https://mlapshin.com/index.php/scrum-quizzes/" target="_blank" rel="noopener">Mikhail Lapshin Scrum quizzes</a><span class="tag free">Practice</span><p>Free quizzes with a Product Owner mode and a real-exam mode. Popular with people who passed.</p></div>
+        <div class="resitem"><a href="https://www.scrum.org/resources/scrum-glossary" target="_blank" rel="noopener">Scrum Glossary</a><span class="tag free">Reference</span><p>Short definitions of Scrum terms. Handy when a word in a question is unclear.</p></div>
+        <div class="resitem"><a href="https://www.scrum.org/resources/suggested-reading-professional-scrum-product-owner" target="_blank" rel="noopener">Suggested reading for PSPO</a><span class="tag free">Reference</span><p>Scrum.org's own list of topics the exam covers and books for each one.</p></div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Paid</h2>
+        <div class="res">
+        <div class="resitem"><a href="https://store.scrum.org/products/pspo-i-assessment" target="_blank" rel="noopener">PSPO I exam (assessment)</a><span class="tag paid">US$200</span><p>The exam itself. 80 questions in 60 minutes, pass mark 85%. Book it once you score 95%+ three times in a row. The certification never expires.</p></div>
+        <div class="resitem"><a href="https://www.amazon.ca/s?k=The+Professional+Product+Owner+McGreal+Jocham" target="_blank" rel="noopener">The Professional Product Owner (McGreal & Jocham)</a><span class="tag paid">Book · optional</span><p>The main book Scrum.org recommends for PSPO. Good for value, vision, stakeholders and release planning. Helpful, but you can pass without it.</p></div>
+        <div class="resitem"><a href="https://www.amazon.ca/s?k=Scrum+A+Pocket+Guide+Verheyen" target="_blank" rel="noopener">Scrum: A Pocket Guide (Verheyen)</a><span class="tag paid">Book · optional</span><p>Short, easy book that explains the Scrum Guide in plain language.</p></div>
+        <div class="resitem"><a href="https://www.udemy.com/courses/search/?q=PSPO%20I%20practice%20exam" target="_blank" rel="noopener">Udemy PSPO I practice exams</a><span class="tag paid">Practice · optional</span><p>Extra timed practice tests. Often on sale. Pick one with recent reviews that follows the 2020 Scrum Guide.</p></div>
+        <div class="resitem"><a href="https://www.scrum.org/courses/professional-scrum-product-owner-training" target="_blank" rel="noopener">Professional Scrum Product Owner class</a><span class="tag paid">Course · optional</span><p>Two-day class with a Professional Scrum Trainer. Expensive, and not needed to pass. Usually includes a free exam attempt.</p></div>
+        </div>
+        <p class="muted" style="font-size:14px">Prices can change. Check the seller's site before buying.</p>
+      </section>
+    </div>
   </div>
 
   <!-- QUESTION BANK (page by page) -->
@@ -497,7 +538,7 @@ const BANK=[
 ["Value & EBM","Which of these is an outcome rather than an output?",["Customers complete checkout 20% faster","The team completed 40 story points","Ten features were shipped","Fifty tickets were closed"],"Outcomes describe a change in customer or business results. The others count work done."]
 ];
 
-const L={guide:["Scrum Guide","https://scrumguides.org/scrum-guide.html"],open:["Product Owner Open","https://www.scrum.org/open-assessments/product-owner-open"],sopen:["Scrum Open","https://www.scrum.org/open-assessments/scrum-open"],ebm:["EBM Guide","https://www.scrum.org/resources/evidence-based-management"],lap:["Lapshin quizzes","https://mlapshin.com/index.php/scrum-quizzes/"],buy:["Buy exam","https://www.scrum.org/assessments/professional-scrum-product-owner-i-certification"],sheet:["Cheat sheet","#cheatsheet"],mock:["In-app mock exam","#practice"],quick:["Quick check","#practice"]};
+const L={guide:["Scrum Guide","https://scrumguides.org/scrum-guide.html"],open:["Product Owner Open","https://www.scrum.org/open-assessments/product-owner-open"],sopen:["Scrum Open","https://www.scrum.org/open-assessments/scrum-open"],ebm:["EBM Guide","https://www.scrum.org/resources/online-evidence-based-management-guide"],lap:["Lapshin quizzes","https://mlapshin.com/index.php/scrum-quizzes/"],buy:["Buy exam","https://www.scrum.org/assessments/professional-scrum-product-owner-i-certification"],sheet:["Cheat sheet","#cheatsheet"],mock:["In-app mock exam","#practice"],quick:["Quick check","#practice"]};
 const SPRINTS=[
  {name:"Sprint 1",goal:"Know the Scrum Guide well enough to explain every rule in your own words.",days:[
   {t:"Read the whole Scrum Guide",m:60,tasks:["Read the Scrum Guide start to finish (about 13 pages)","Write down every term you can't explain yet"],links:["guide"]},
@@ -555,7 +596,7 @@ PSETS.forEach(set=>set.qs.forEach(q=>{if(q.type==="single"||q.type==="tf"||q.typ
   BANK.push([q.topic,q.q.replace("____","______"),opts,q.why])}}));
 
 // ---------- tabs
-const TABS=["plan","cheatsheet","practice","qbank","notes","ask"];
+const TABS=["plan","cheatsheet","practice","qbank","resources","notes","ask"];
 function showTab(t,scroll){if(!TABS.includes(t))t="plan";
   TABS.forEach(x=>{$("view-"+x).hidden=x!==t;$("tab-"+x).setAttribute("aria-selected",String(x===t))});
   if(scroll)window.scrollTo({top:0});}
