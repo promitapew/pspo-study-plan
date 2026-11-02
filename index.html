@@ -106,6 +106,76 @@ svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
 .opt.right{border-color:var(--good);background:var(--good-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
 .explain{border-left:3px solid var(--accent);padding:4px 0 4px 12px}
+/* visual guide */
+.vg{display:grid;gap:22px}
+.vg-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px;min-width:0}
+.vg-card>p{margin:0}
+.vg-k{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.vg-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.vg-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.vg-sprintbar{border:2px dashed var(--today);border-radius:12px;padding:12px;display:grid;gap:10px}
+.vg-sprintbar>.vg-k{color:var(--ink)}
+.vg-flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+.vg-step{flex:1 1 128px;border-radius:10px;padding:10px 12px;display:grid;gap:4px;align-content:start;min-width:0}
+.vg-step b{font-family:var(--display);font-size:15px;line-height:1.2}
+.vg-step span{font-size:13px;color:var(--muted);line-height:1.35}
+.vg-step em{font-style:normal;font-family:var(--mono);font-size:12px}
+.vg-art{background:var(--accent-soft);border:1px solid var(--accent)}
+.vg-art em{color:var(--accent)}
+.vg-ev{background:var(--today-soft);border:1px solid var(--today)}
+.vg-arrow{align-self:center;color:var(--muted);font-size:18px;flex:0 0 auto}
+@media (max-width:640px){.vg-flow{flex-direction:column}.vg-arrow{transform:rotate(90deg);align-self:center}}
+.vg-chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center}
+.vg-pillar{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:10px 12px;text-align:center;display:grid;gap:2px}
+.vg-pillar b{font-family:var(--display);font-size:16px}
+.vg-pillar span{font-size:13px;color:var(--muted)}
+.vg-link{font-size:12px;color:var(--muted);text-align:center;line-height:1.2}
+.vg-link b{display:block;font-size:18px;color:var(--ink)}
+@media (max-width:640px){.vg-chain{grid-template-columns:1fr}.vg-link b{transform:rotate(90deg)}}
+.vg-warn{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.vg-warn div{border-left:3px solid var(--bad);background:var(--bad-soft);padding:8px 10px;border-radius:0 8px 8px 0;font-size:14px}
+.vg-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.vg-box{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:6px;align-content:start;background:var(--bg)}
+.vg-box b{font-family:var(--display);font-size:16px}
+.vg-box ul{margin:0;padding-left:18px;display:grid;gap:3px;font-size:14px}
+.vg-box p{margin:0;font-size:14px}
+.vg-values{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.vg-val{border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:6px 12px;display:grid;line-height:1.25}
+.vg-val b{font-size:14px}
+.vg-val span{font-size:12px;color:var(--muted)}
+.vg-trust{font-weight:700;color:var(--good)}
+.vg-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.vg-num{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg)}
+.vg-num b{display:block;font-family:var(--display);font-size:28px;line-height:1.1;color:var(--accent)}
+.vg-num span{font-size:13px;color:var(--muted)}
+.vg-team{border:2px solid var(--accent);border-radius:12px;padding:12px;display:grid;gap:12px}
+.vg-teamhead{display:flex;flex-wrap:wrap;gap:6px}
+.vg-teamhead span{font-size:13px;border-radius:99px;padding:3px 10px;background:var(--accent-soft);color:var(--ink)}
+.vg-acc{font-size:13px;color:var(--accent);font-weight:700}
+.vg-serve{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.vg-serve div{border:1px dashed var(--line);border-radius:8px;padding:8px 10px;font-size:13px}
+.vg-serve div b{display:block;font-size:13px;margin-bottom:2px}
+.vg-events{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.vg-event{border:1px solid var(--today);border-radius:10px;padding:12px;display:grid;gap:6px;align-content:start;background:var(--today-soft)}
+.vg-event .t{font-family:var(--display);font-size:24px;line-height:1}
+.vg-event b{font-size:16px}
+.vg-event p{margin:0;font-size:13px}
+.vg-event .who{color:var(--muted)}
+.vg-why{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:640px){.vg-why{grid-template-columns:1fr}}
+.vg-why div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--surface)}
+.vg-why b{display:block;font-size:14px}
+.vg-arts{display:grid;gap:10px}
+.vg-artrow{display:grid;grid-template-columns:minmax(130px,1fr) auto minmax(130px,1fr) 2fr;gap:10px;align-items:center}
+@media (max-width:640px){.vg-artrow{grid-template-columns:1fr auto 1fr}.vg-artrow p{grid-column:1/-1}}
+.vg-artrow .a{background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px;font-weight:700;text-align:center}
+.vg-artrow .c{border:2px solid var(--good);background:var(--good-soft);border-radius:10px;padding:10px;font-weight:700;text-align:center}
+.vg-artrow p{margin:0;font-size:13px;color:var(--muted)}
+.vg-matrix td,.vg-matrix th{text-align:center}
+.vg-matrix td:first-child,.vg-matrix th:first-child{text-align:left}
+.vg-dot{color:var(--accent);font-size:18px}
+.vg-yes li::marker{content:"✓  ";color:var(--good)}
+.vg-no li::marker{content:"✗  ";color:var(--bad)}
 /* page question bank */
 .qbtop{display:grid;gap:12px}
 .sets{display:flex;flex-wrap:wrap;gap:8px}
@@ -206,6 +276,7 @@ footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16p
   <nav class="tabs" role="tablist">
     <button class="tab" role="tab" data-tab="plan" id="tab-plan" type="button">Plan</button>
     <button class="tab" role="tab" data-tab="cheatsheet" id="tab-cheatsheet" type="button">Cheat sheet</button>
+    <button class="tab" role="tab" data-tab="visual" id="tab-visual" type="button">Visual guide</button>
     <button class="tab" role="tab" data-tab="practice" id="tab-practice" type="button">Practice &amp; mock exam</button>
     <button class="tab" role="tab" data-tab="qbank" id="tab-qbank" type="button">Question bank</button>
     <button class="tab" role="tab" data-tab="resources" id="tab-resources" type="button">Resources</button>
@@ -314,6 +385,176 @@ footer{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16p
         </ul>
       </section>
     </div>
+  </div>
+
+  <!-- VISUAL GUIDE -->
+  <div class="view vg" id="view-visual" hidden>
+    <p class="intro">The whole 2020 Scrum Guide as pictures. Read top to bottom once, then come back to any card before a quiz.</p>
+
+    <section class="vg-card">
+      <span class="vg-k">1 · Scrum on one page</span>
+      <h2>How one Sprint flows</h2>
+      <div class="vg-legend"><span><i style="background:var(--accent-soft);border:1px solid var(--accent)"></i>Artifact (with its commitment)</span><span><i style="background:var(--today-soft);border:1px solid var(--today)"></i>Event (with its timebox for a 1-month Sprint)</span></div>
+      <div class="vg-flow">
+        <div class="vg-step vg-art"><b>Product Backlog</b><em>Product Goal</em><span>Ordered list of everything that might improve the product. Owned by the PO.</span></div>
+        <div class="vg-arrow" aria-hidden="true">→</div>
+        <div class="vg-sprintbar" style="flex:4 1 480px">
+          <span class="vg-k">The Sprint · fixed length, 1 month or less · contains all other events</span>
+          <div class="vg-flow">
+            <div class="vg-step vg-ev"><b>Sprint Planning</b><em>≤ 8 h</em><span>Why, what and how. Creates the Sprint Goal.</span></div>
+            <div class="vg-arrow" aria-hidden="true">→</div>
+            <div class="vg-step vg-art"><b>Sprint Backlog</b><em>Sprint Goal</em><span>Goal + selected items + the plan. Owned by the Developers.</span></div>
+            <div class="vg-arrow" aria-hidden="true">→</div>
+            <div class="vg-step vg-ev"><b>Daily Scrum ↻</b><em>15 min, every day</em><span>Developers inspect progress and adapt the plan.</span></div>
+            <div class="vg-arrow" aria-hidden="true">→</div>
+            <div class="vg-step vg-art"><b>Increment</b><em>Definition of Done</em><span>Usable, Done work. Can be released any time.</span></div>
+            <div class="vg-arrow" aria-hidden="true">→</div>
+            <div class="vg-step vg-ev"><b>Sprint Review</b><em>≤ 4 h</em><span>Inspect the outcome with stakeholders; adapt the backlog.</span></div>
+            <div class="vg-arrow" aria-hidden="true">→</div>
+            <div class="vg-step vg-ev"><b>Retrospective</b><em>≤ 3 h</em><span>Improve quality and effectiveness. Ends the Sprint.</span></div>
+          </div>
+        </div>
+        <div class="vg-arrow" aria-hidden="true">↻</div>
+        <div class="vg-step" style="border:1px dashed var(--line)"><b>Next Sprint</b><span>Starts right after the previous one ends.</span></div>
+      </div>
+      <p class="muted" style="font-size:14px">Product Backlog refinement happens all the time. It is an activity, not an event.</p>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">2 · Numbers to remember</span>
+      <div class="vg-nums">
+        <div class="vg-num"><b>3</b><span>pillars</span></div>
+        <div class="vg-num"><b>5</b><span>values</span></div>
+        <div class="vg-num"><b>3</b><span>accountabilities</span></div>
+        <div class="vg-num"><b>5</b><span>events (Sprint + 4 inside)</span></div>
+        <div class="vg-num"><b>3</b><span>artifacts, each with 1 commitment</span></div>
+        <div class="vg-num"><b>≤ 10</b><span>people in a Scrum Team</span></div>
+        <div class="vg-num"><b>≤ 1 mo</b><span>Sprint length</span></div>
+        <div class="vg-num"><b>8 · 4 · 3</b><span>hours: Planning · Review · Retro</span></div>
+        <div class="vg-num"><b>15 min</b><span>Daily Scrum, any Sprint length</span></div>
+        <div class="vg-num"><b>1</b><span>Product Owner: a person, not a committee</span></div>
+        <div class="vg-num"><b>1</b><span>Product Goal at a time</span></div>
+        <div class="vg-num"><b>1</b><span>Product Backlog per product</span></div>
+      </div>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">3 · Theory</span>
+      <h2>Why Scrum works</h2>
+      <div class="vg-two">
+        <div class="vg-box"><b>Empiricism</b><p>Knowledge comes from experience and making decisions based on what is observed.</p></div>
+        <div class="vg-box"><b>Lean thinking</b><p>Reduce waste and focus on the essentials.</p></div>
+      </div>
+      <p style="font-size:14px">Iterative and incremental, to <strong>optimize predictability</strong> and <strong>control risk</strong>.</p>
+      <div class="vg-chain">
+        <div class="vg-pillar"><b>Transparency</b><span>Work and process visible to those doing and receiving it</span></div>
+        <div class="vg-link"><b>→</b>enables</div>
+        <div class="vg-pillar"><b>Inspection</b><span>Check artifacts and progress often, to spot problems</span></div>
+        <div class="vg-link"><b>→</b>enables</div>
+        <div class="vg-pillar"><b>Adaptation</b><span>Adjust as soon as possible when something is off</span></div>
+      </div>
+      <div class="vg-warn">
+        <div>Inspection <strong>without transparency</strong> is misleading and wasteful.</div>
+        <div>Inspection <strong>without adaptation</strong> is pointless.</div>
+        <div>Adaptation is harder when people are <strong>not empowered or self-managing</strong>.</div>
+      </div>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">4 · Values</span>
+      <h2>Five values bring the pillars to life</h2>
+      <div class="vg-values">
+        <div class="vg-val"><b>Commitment</b><span>to goals and each other</span></div>
+        <div class="vg-val"><b>Focus</b><span>on the Sprint's work</span></div>
+        <div class="vg-val"><b>Openness</b><span>about work and challenges</span></div>
+        <div class="vg-val"><b>Respect</b><span>as capable, independent people</span></div>
+        <div class="vg-val"><b>Courage</b><span>to do the right thing</span></div>
+        <span aria-hidden="true">→</span><span class="vg-trust">Pillars come to life → trust</span>
+      </div>
+      <p class="muted" style="font-size:14px">Trap: transparency is a <em>pillar</em>, not a value.</p>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">5 · The Scrum Team</span>
+      <h2>One team, three accountabilities</h2>
+      <div class="vg-team">
+        <div class="vg-teamhead"><span>10 or fewer</span><span>Cross-functional</span><span>Self-managing: who, what, when, how</span><span>No sub-teams or hierarchies</span><span>One Product Goal at a time</span><span>Whole team accountable for a valuable Increment every Sprint</span></div>
+        <div class="vg-two">
+          <div class="vg-box"><b>Product Owner</b><span class="vg-acc">Maximizes the value of the product</span>
+            <ul><li>Develops and communicates the Product Goal</li><li>Creates and clearly communicates backlog items</li><li>Orders the Product Backlog</li><li>Keeps the backlog transparent, visible, understood</li><li>Can delegate, stays accountable</li><li>One person; others must convince the PO</li></ul></div>
+          <div class="vg-box"><b>Developers</b><span class="vg-acc">Create a usable Increment each Sprint</span>
+            <ul><li>Create the Sprint plan (Sprint Backlog)</li><li>Instill quality via the Definition of Done</li><li>Adapt the plan daily toward the Sprint Goal</li><li>Hold each other accountable as professionals</li><li>Size backlog items</li></ul></div>
+          <div class="vg-box"><b>Scrum Master</b><span class="vg-acc">Establishes Scrum; team effectiveness</span>
+            <ul><li>Helps everyone understand Scrum theory and practice</li><li>Enables the team to improve its practices</li><li>A true leader who serves</li></ul></div>
+        </div>
+        <div class="vg-serve">
+          <div><b>SM serves the Scrum Team</b>Coaches self-management and cross-functionality · focuses on Done, high-value Increments · causes removal of impediments · keeps events positive, productive, timeboxed</div>
+          <div><b>SM serves the Product Owner</b>Techniques for Product Goal and backlog · clear, concise backlog items · empirical product planning · facilitates stakeholder collaboration</div>
+          <div><b>SM serves the organization</b>Leads, trains, coaches Scrum adoption · plans and advises implementations · helps enact an empirical approach · removes barriers between stakeholders and teams</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">6 · The events</span>
+      <h2>Five events, each a chance to inspect and adapt</h2>
+      <div class="vg-events">
+        <div class="vg-event"><span class="t">≤ 1 month</span><b>The Sprint</b><p class="who">Whole Scrum Team</p><p>Container for all events. No changes that endanger the Sprint Goal; quality does not drop; scope can be renegotiated with the PO. Only the PO can cancel, if the Sprint Goal becomes obsolete.</p></div>
+        <div class="vg-event"><span class="t">≤ 8 h</span><b>Sprint Planning</b><p class="who">Scrum Team (may invite others)</p><p>Output: Sprint Goal + selected items + plan = Sprint Backlog.</p></div>
+        <div class="vg-event"><span class="t">15 min</span><b>Daily Scrum</b><p class="who">Developers (PO/SM join only if working on items)</p><p>Inspect progress toward the Sprint Goal; adapt the Sprint Backlog. Same time and place.</p></div>
+        <div class="vg-event"><span class="t">≤ 4 h</span><b>Sprint Review</b><p class="who">Scrum Team + key stakeholders</p><p>A working session, not just a demo. Inspect the outcome; adapt the Product Backlog. Second-to-last event.</p></div>
+        <div class="vg-event"><span class="t">≤ 3 h</span><b>Sprint Retrospective</b><p class="who">Scrum Team</p><p>Inspect people, interactions, processes, tools and the DoD. Plan improvements. Ends the Sprint.</p></div>
+      </div>
+      <div><span class="vg-k">Sprint Planning's three topics</span>
+        <div class="vg-why" style="margin-top:8px">
+          <div><b>1 · Why is this Sprint valuable?</b>PO proposes how to increase value; the whole team defines the Sprint Goal.</div>
+          <div><b>2 · What can be Done?</b>Developers select items, in discussion with the PO.</div>
+          <div><b>3 · How will it get done?</b>Developers plan the work, often in pieces of a day or less.</div>
+        </div>
+      </div>
+      <p class="muted" style="font-size:14px">Shorter Sprints usually have shorter timeboxes. The Daily Scrum stays 15 minutes.</p>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">7 · Artifacts and commitments</span>
+      <h2>Each artifact has one commitment to measure progress against</h2>
+      <div class="vg-arts">
+        <div class="vg-artrow"><div class="a">Product Backlog</div><span aria-hidden="true">→</span><div class="c">Product Goal</div><p>Emergent, ordered, single source of work. One per product. Fulfill or abandon a Product Goal before taking the next.</p></div>
+        <div class="vg-artrow"><div class="a">Sprint Backlog</div><span aria-hidden="true">→</span><div class="c">Sprint Goal</div><p>Why + what + how. Owned and updated by Developers all Sprint. The goal is fixed; the plan can change.</p></div>
+        <div class="vg-artrow"><div class="a">Increment</div><span aria-hidden="true">→</span><div class="c">Definition of Done</div><p>Usable, additive, verified. Several per Sprint allowed, releasable before the Review. Not Done = not shown, back to the backlog. One shared DoD for teams on one product.</p></div>
+      </div>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">8 · Who does what</span>
+      <h2>Quick answer key for "who…?" questions</h2>
+      <div class="tablewrap"><table class="vg-matrix">
+        <thead><tr><th>Decision or task</th><th>PO</th><th>Developers</th><th>SM</th><th>Whole team</th></tr></thead>
+        <tbody>
+          <tr><td>Product Goal</td><td class="vg-dot">●</td><td></td><td></td><td></td></tr>
+          <tr><td>Order the Product Backlog</td><td class="vg-dot">●</td><td></td><td></td><td></td></tr>
+          <tr><td>Size backlog items</td><td></td><td class="vg-dot">●</td><td></td><td></td></tr>
+          <tr><td>Define the Sprint Goal</td><td></td><td></td><td></td><td class="vg-dot">●</td></tr>
+          <tr><td>Select items for the Sprint</td><td></td><td class="vg-dot">●</td><td></td><td></td></tr>
+          <tr><td>Own and change the Sprint Backlog</td><td></td><td class="vg-dot">●</td><td></td><td></td></tr>
+          <tr><td>Create the DoD (if no org standard)</td><td></td><td></td><td></td><td class="vg-dot">●</td></tr>
+          <tr><td>Cancel the Sprint</td><td class="vg-dot">●</td><td></td><td></td><td></td></tr>
+          <tr><td>Run the Daily Scrum</td><td></td><td class="vg-dot">●</td><td></td><td></td></tr>
+          <tr><td>Keep events timeboxed and productive</td><td></td><td></td><td class="vg-dot">●</td><td></td></tr>
+          <tr><td>Cause removal of impediments</td><td></td><td></td><td class="vg-dot">●</td><td></td></tr>
+          <tr><td>A valuable, useful Increment</td><td></td><td></td><td></td><td class="vg-dot">●</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="vg-card">
+      <span class="vg-k">9 · Exam traps</span>
+      <h2>In Scrum vs. not in Scrum</h2>
+      <div class="vg-two">
+        <div class="vg-box"><b>In the Scrum Guide</b><ul class="vg-yes"><li>Product Goal, Sprint Goal, Definition of Done</li><li>Product Backlog refinement (an activity)</li><li>Releasing before the Sprint Review</li><li>Several Increments per Sprint</li><li>Technical work in the same Product Backlog</li><li>Accountabilities, not job titles</li></ul></div>
+        <div class="vg-box"><b>Not part of Scrum</b><ul class="vg-no"><li>User stories and story points (optional practices)</li><li>Velocity and burn-down charts</li><li>Definition of Ready</li><li>Sprint 0, hardening or release Sprints</li><li>Team lead, project manager, PO committee</li><li>Sub-teams (e.g. a separate test team)</li></ul></div>
+      </div>
+    </section>
   </div>
 
   <!-- PRACTICE -->
@@ -596,7 +837,7 @@ PSETS.forEach(set=>set.qs.forEach(q=>{if(q.type==="single"||q.type==="tf"||q.typ
   BANK.push([q.topic,q.q.replace("____","______"),opts,q.why])}}));
 
 // ---------- tabs
-const TABS=["plan","cheatsheet","practice","qbank","resources","notes","ask"];
+const TABS=["plan","cheatsheet","visual","practice","qbank","resources","notes","ask"];
 function showTab(t,scroll){if(!TABS.includes(t))t="plan";
   TABS.forEach(x=>{$("view-"+x).hidden=x!==t;$("tab-"+x).setAttribute("aria-selected",String(x===t))});
   if(scroll)window.scrollTo({top:0});}
